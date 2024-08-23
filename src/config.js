@@ -11,4 +11,7 @@ export const config = {
     },
     targetText: "Be a PhonePe-r & Transform FinTech!",
   },
+  flipkart: {
+    url: "https://public.zwayam.com/jobs/search",
+  },
 };
