@@ -12,26 +12,18 @@ export async function scrapePhonePeJobs(page) {
       const jobCards = document.querySelectorAll(selectors.jobCard);
       return Array.from(jobCards).map((card) => ({
         title: card.querySelector(selectors.title)?.textContent.trim() || "",
+        company: "PhonePe",
         department:
           card.querySelector(selectors.department)?.textContent.trim() || "",
         location:
           card.querySelector(selectors.location)?.textContent.trim() || "",
         type: card.querySelector(selectors.type)?.textContent.trim() || "",
-        date: card.querySelector(selectors.date)?.textContent.trim() || "",
         url: card.getAttribute("href") || "",
+        jobCode: card.getAttribute("href")?.split("/").pop() || "",
+        createdDate: new Date().toISOString(),
+        modifiedDate: new Date().toISOString(),
       }));
     }, selectors);
-
-    const foundTargetText = await page.evaluate((targetText) => {
-      const element = Array.from(document.querySelectorAll("div")).find((el) =>
-        el.textContent.includes(targetText),
-      );
-      return element ? element.textContent.trim() : null;
-    }, targetText);
-
-    if (foundTargetText) {
-      logger.info(`Found target text: ${foundTargetText}`);
-    }
 
     return jobs;
   } catch (error) {

@@ -1,3 +1,5 @@
+// scrapers/flipkart.js
+
 import axios from "axios";
 import FormData from "form-data";
 import { config } from "../config.js";
@@ -70,8 +72,12 @@ function parseJobsFromResponse(data) {
   const jobsData = data.data.data;
   return jobsData.map((job) => ({
     title: job._source.jobTitle,
+    company: "Flipkart",
     department: job._source.DepartmentName,
     location: job._source.location,
+    type: "Full-time", // Assuming all Flipkart jobs are full-time
+    url: `https://www.flipkartcareers.com/#!/jobdetails/${job._source.jobCode}`,
+    description: job._source.Description,
     experience:
       job._source.yrsOfExperience ||
       `${job._source.minYearOfExperience || 0} to ${job._source.maxYearOfExperience || "Not specified"} Years`,
@@ -79,9 +85,7 @@ function parseJobsFromResponse(data) {
       ? job._source.mandatorySkills.join(", ")
       : "Not specified",
     jobCode: job._source.jobCode,
-    description: job._source.Description,
-    qualifications: job._source.eduqualification,
-    createdDate: new Date(job._source.createdDate).toLocaleDateString(),
-    modifiedDate: new Date(job._source.modifiedDate).toLocaleDateString(),
+    createdDate: new Date(job._source.createdDate).toISOString(),
+    modifiedDate: new Date(job._source.modifiedDate).toISOString(),
   }));
 }

@@ -1,76 +1,54 @@
 import { launchBrowser, createPage } from "./utils/browser.js";
 import { scrapePhonePeJobs } from "./scrapers/phonepe.js";
 import { scrapeFlipkartJobs } from "./scrapers/flipkart.js";
+import { scrapeAirbnbJobs } from "./scrapers/airbnb.js";
 import logger from "./utils/logger.js";
-import fs from "fs/promises";
+import { sendJobsToAPI } from "./utils/sendJobs.js";
+import { validateAndNormalizeJob } from "./utils/jobUtils.js";
 
 async function main() {
   let browser;
   try {
-    // Scrape PhonePe jobs
     browser = await launchBrowser();
-    const page = await createPage(browser);
-    const phonePeJobs = await scrapePhonePeJobs(page);
+
+    // Scrape PhonePe jobs
+    const phonePeJobs = await scrapePhonePeJobs(browser);
     logger.info(`Found ${phonePeJobs.length} PhonePe jobs`);
 
-    // Log PhonePe jobs to a file
-    await logJobsToFile(phonePeJobs, "phonepe_jobs.json");
-
-    // Console output for PhonePe jobs
-    console.log("PhonePe Jobs:");
-    console.table(
-      phonePeJobs.map((job) => ({
-        Title: truncateString(job.title, 47),
-        Department: truncateString(job.department, 27),
-        Location: truncateString(job.location, 27),
-        Type: truncateString(job.type, 12),
-        Date: job.date,
-      })),
-    );
-
-    // Scrape Flipkart jobs
-    const flipkartJobs = await scrapeFlipkartJobs();
+    // // Scrape Flipkart jobs
+    const flipkartJobs = await scrapeFlipkartJobs(browser);
     logger.info(`Found ${flipkartJobs.length} Flipkart jobs`);
 
-    // Log Flipkart jobs to a file
-    await logJobsToFile(flipkartJobs, "flipkart_jobs.json");
+    // Scrape Airbnb jobs
+    const airbnbJobs = await scrapeAirbnbJobs(browser);
+    logger.info(`Found ${airbnbJobs.length} Airbnb jobs`);
 
-    // Console output for Flipkart jobs
-    console.log("\nFlipkart Jobs:");
-    console.table(
-      flipkartJobs.map((job) => ({
-        Title: truncateString(job.title, 40),
-        Department: truncateString(job.department, 20),
-        Location: truncateString(job.location, 20),
-        Experience: job.experience,
-        Skills: truncateString(job.skills, 50),
-        JobCode: job.jobCode,
-        CreatedDate: job.createdDate,
-        ModifiedDate: job.modifiedDate,
-      })),
-    );
+    // Combine all jobs
+    let allJobs = [...phonePeJobs, ...flipkartJobs, ...airbnbJobs];
+
+    // Filter and process jobs
+    allJobs = allJobs.map(validateAndNormalizeJob).filter(Boolean);
+
+    logger.info(`Total valid jobs to be sent: ${allJobs.length}`);
+
+    // Log the first few jobs for debugging
+    allJobs.slice(0, 5).forEach((job, index) => {
+      logger.info(`Job ${index + 1}:`, JSON.stringify(job, null, 2));
+    });
+
+    // Send jobs to API
+    const result = await sendJobsToAPI(allJobs);
+    logger.info(`API response: ${JSON.stringify(result)}`);
+
+    // Console output for all jobs
+    console.table(allJobs);
   } catch (error) {
     logger.error(`An error occurred: ${error.message}`);
+    logger.error(error.stack); // Log the full stack trace
   } finally {
     if (browser) {
       await browser.close();
     }
-  }
-}
-
-function truncateString(str, maxLength) {
-  if (str && str.length > maxLength) {
-    return str.slice(0, maxLength - 3) + "...";
-  }
-  return str || "";
-}
-
-async function logJobsToFile(jobs, filename) {
-  try {
-    await fs.writeFile(filename, JSON.stringify(jobs, null, 2));
-    logger.info(`Jobs logged to ${filename}`);
-  } catch (error) {
-    logger.error(`Error writing to ${filename}: ${error.message}`);
   }
 }
 
