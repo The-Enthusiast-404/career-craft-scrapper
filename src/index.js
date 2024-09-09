@@ -1,6 +1,7 @@
 import { launchBrowser, createPage } from "./utils/browser.js";
 import { scrapePhonePeJobs } from "./scrapers/phonepe.js";
 import { scrapeFlipkartJobs } from "./scrapers/flipkart.js";
+import { scrapeAirbnbJobs } from "./scrapers/airbnb.js";
 import logger from "./utils/logger.js";
 import { sendJobsToAPI } from "./utils/sendJobs.js";
 import { validateAndNormalizeJob } from "./utils/jobUtils.js";
@@ -9,18 +10,21 @@ async function main() {
   let browser;
   try {
     browser = await launchBrowser();
-    const page = await createPage(browser);
 
     // Scrape PhonePe jobs
-    const phonePeJobs = await scrapePhonePeJobs(page);
+    const phonePeJobs = await scrapePhonePeJobs(browser);
     logger.info(`Found ${phonePeJobs.length} PhonePe jobs`);
 
-    // Scrape Flipkart jobs
-    const flipkartJobs = await scrapeFlipkartJobs();
+    // // Scrape Flipkart jobs
+    const flipkartJobs = await scrapeFlipkartJobs(browser);
     logger.info(`Found ${flipkartJobs.length} Flipkart jobs`);
 
+    // Scrape Airbnb jobs
+    const airbnbJobs = await scrapeAirbnbJobs(browser);
+    logger.info(`Found ${airbnbJobs.length} Airbnb jobs`);
+
     // Combine all jobs
-    let allJobs = [...phonePeJobs, ...flipkartJobs];
+    let allJobs = [...phonePeJobs, ...flipkartJobs, ...airbnbJobs];
 
     // Filter and process jobs
     allJobs = allJobs.map(validateAndNormalizeJob).filter(Boolean);
