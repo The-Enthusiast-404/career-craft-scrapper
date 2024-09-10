@@ -2,6 +2,7 @@ import { launchBrowser, createPage } from "./utils/browser.js";
 import { scrapePhonePeJobs } from "./scrapers/phonepe.js";
 import { scrapeFlipkartJobs } from "./scrapers/flipkart.js";
 import { scrapeAirbnbJobs } from "./scrapers/airbnb.js";
+import { scrapePaytmJobs } from "./scrapers/paytm.js"; // Import the new Paytm scraper
 import logger from "./utils/logger.js";
 import { sendJobsToAPI } from "./utils/sendJobs.js";
 import { validateAndNormalizeJob } from "./utils/jobUtils.js";
@@ -12,19 +13,28 @@ async function main() {
     browser = await launchBrowser();
 
     // Scrape PhonePe jobs
-    const phonePeJobs = await scrapePhonePeJobs(browser);
-    logger.info(`Found ${phonePeJobs.length} PhonePe jobs`);
+    // const phonePeJobs = await scrapePhonePeJobs(browser);
+    // logger.info(`Found ${phonePeJobs.length} PhonePe jobs`);
 
     // // Scrape Flipkart jobs
-    const flipkartJobs = await scrapeFlipkartJobs(browser);
-    logger.info(`Found ${flipkartJobs.length} Flipkart jobs`);
+    // const flipkartJobs = await scrapeFlipkartJobs(browser);
+    // logger.info(`Found ${flipkartJobs.length} Flipkart jobs`);
 
-    // Scrape Airbnb jobs
-    const airbnbJobs = await scrapeAirbnbJobs(browser);
-    logger.info(`Found ${airbnbJobs.length} Airbnb jobs`);
+    // // Scrape Airbnb jobs
+    // const airbnbJobs = await scrapeAirbnbJobs(browser);
+    // logger.info(`Found ${airbnbJobs.length} Airbnb jobs`);
+
+    // Scrape Paytm jobs
+    const paytmJobs = await scrapePaytmJobs(browser);
+    logger.info(`Found ${paytmJobs.length} Paytm jobs`);
 
     // Combine all jobs
-    let allJobs = [...phonePeJobs, ...flipkartJobs, ...airbnbJobs];
+    let allJobs = [
+      // ...phonePeJobs,
+      // ...flipkartJobs,
+      // ...airbnbJobs,
+      ...paytmJobs,
+    ];
 
     // Filter and process jobs
     allJobs = allJobs.map(validateAndNormalizeJob).filter(Boolean);
