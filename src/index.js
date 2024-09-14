@@ -6,6 +6,7 @@ import { scrapePaytmJobs } from "./scrapers/paytm.js"; // Import the new Paytm s
 import logger from "./utils/logger.js";
 import { sendJobsToAPI } from "./utils/sendJobs.js";
 import { validateAndNormalizeJob } from "./utils/jobUtils.js";
+import { scrapeHackerNewsJobs } from "./scrapers/hackernews.js";
 
 async function main() {
   let browser;
@@ -25,15 +26,20 @@ async function main() {
     // logger.info(`Found ${airbnbJobs.length} Airbnb jobs`);
 
     // Scrape Paytm jobs
-    const paytmJobs = await scrapePaytmJobs(browser);
-    logger.info(`Found ${paytmJobs.length} Paytm jobs`);
+    // const paytmJobs = await scrapePaytmJobs(browser);
+    // logger.info(`Found ${paytmJobs.length} Paytm jobs`);
+
+    // Scrape Hacker News jobs
+    const hackerNewsJobs = await scrapeHackerNewsJobs();
+    logger.info(`Found ${hackerNewsJobs.length} Hacker News jobs`);
 
     // Combine all jobs
     let allJobs = [
       // ...phonePeJobs,
       // ...flipkartJobs,
       // ...airbnbJobs,
-      ...paytmJobs,
+      // ...paytmJobs,
+      ...hackerNewsJobs,
     ];
 
     // Filter and process jobs
