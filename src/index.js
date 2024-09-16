@@ -8,6 +8,7 @@ import { sendJobsToAPI } from "./utils/sendJobs.js";
 import { validateAndNormalizeJob } from "./utils/jobUtils.js";
 import { scrapeHackerNewsJobs } from "./scrapers/hackernews.js";
 import { scrapeMozillaJobs } from "./scrapers/mozilla.js";
+import { scrapeSpotifyJobs } from "./scrapers/spotify.js";
 
 async function main() {
   let browser;
@@ -35,8 +36,12 @@ async function main() {
     // logger.info(`Found ${hackerNewsJobs.length} Hacker News jobs`);
     //
 
-    const mozillaJobs = await scrapeMozillaJobs(browser);
-    logger.info(`Found ${mozillaJobs.length} Mozilla jobs`);
+    // const mozillaJobs = await scrapeMozillaJobs(browser);
+    // logger.info(`Found ${mozillaJobs.length} Mozilla jobs`);
+    //
+
+    const spotifyJobs = await scrapeSpotifyJobs(browser);
+    logger.info(`Found ${spotifyJobs.length} Spotify jobs`);
 
     // Combine all jobs
     let allJobs = [
@@ -45,7 +50,8 @@ async function main() {
       // ...airbnbJobs,
       // ...paytmJobs,
       // ...hackerNewsJobs,
-      ...mozillaJobs,
+      // ...mozillaJobs,
+      ...spotifyJobs,
     ];
 
     // Filter and process jobs
