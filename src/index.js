@@ -45,7 +45,7 @@ async function main() {
     logger.info(`Found ${spotifyJobs.length} Spotify jobs`);
 
     const atlassianJobs = await scrapeAtlassianJobs(browser);
-    logger.info(`Found ${atlassianJobs.length} Trello jobs`);
+    logger.info(`Found ${atlassianJobs.length} Atlassian jobs`);
 
     // Combine all jobs
     let allJobs = [
