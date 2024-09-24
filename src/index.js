@@ -9,7 +9,7 @@ import { validateAndNormalizeJob } from "./utils/jobUtils.js";
 import { scrapeHackerNewsJobs } from "./scrapers/hackernews.js";
 import { scrapeMozillaJobs } from "./scrapers/mozilla.js";
 import { scrapeSpotifyJobs } from "./scrapers/spotify.js";
-import { scrapeTrelloJobs } from "./scrapers/trello.js";
+import { scrapeAtlassianJobs } from "./scrapers/atlassian.js";
 
 async function main() {
   let browser;
@@ -44,8 +44,8 @@ async function main() {
     const spotifyJobs = await scrapeSpotifyJobs(browser);
     logger.info(`Found ${spotifyJobs.length} Spotify jobs`);
 
-    const trelloJobs = await scrapeTrelloJobs(browser);
-    logger.info(`Found ${trelloJobs.length} Trello jobs`);
+    const atlassianJobs = await scrapeAtlassianJobs(browser);
+    logger.info(`Found ${atlassianJobs.length} Trello jobs`);
 
     // Combine all jobs
     let allJobs = [
@@ -56,7 +56,7 @@ async function main() {
       // ...hackerNewsJobs,
       // ...mozillaJobs,
       ...spotifyJobs,
-      ...trelloJobs,
+      ...atlassianJobs,
     ];
 
     // Filter and process jobs
