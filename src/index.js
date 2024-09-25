@@ -10,8 +10,7 @@ import { scrapeHackerNewsJobs } from "./scrapers/hackernews.js";
 import { scrapeMozillaJobs } from "./scrapers/mozilla.js";
 import { scrapeSpotifyJobs } from "./scrapers/spotify.js";
 import {ScrapLyfJobs} from './scrapers/lyft.js'
-import pkg from "winston";
-const { info } = pkg;
+import { ScrapSlackJobs } from "./scrapers/Slack.js";
 
 
 async function main() {
@@ -45,13 +44,15 @@ async function main() {
 
     //Scrapping the lyft jobss
 
-    const lyftJobs = await ScrapLyfJobs(browser);
-    console.log('Lyft Jobs:');
-    logger.info(`Found ${lyftJobs.length} Lyft Jobs`);
-    // console.table(lyftJobs);  
+    // const lyftJobs = await ScrapLyfJobs(browser);
+    // console.log('Lyft Jobs:');
+    // logger.info(`Found ${lyftJobs.length} Lyft Jobs`);
 
     // const spotifyJobs = await scrapeSpotifyJobs(browser);
     // logger.info(`Found ${spotifyJobs.length} Spotify jobs`);
+
+    const slackJobs = await ScrapSlackJobs(browser);
+    logger.info(`Found ${slackJobs.length} Slack Jobs`);
 
     // Combine all jobs
     let allJobs = [
@@ -62,11 +63,13 @@ async function main() {
       // ...hackerNewsJobs,
       // ...mozillaJobs,
       // ...spotifyJobs,
-      ...lyftJobs,
+      // ...lyftJobs,
+      ...slackJobs,
     ];
 
     // Filter and process jobs
     allJobs = allJobs.map(validateAndNormalizeJob).filter(Boolean);
+
 
     logger.info(`Total valid jobs to be sent: ${allJobs.length}`);
 
