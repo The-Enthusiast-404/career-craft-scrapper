@@ -9,7 +9,8 @@ import { validateAndNormalizeJob } from "./utils/jobUtils.js";
 import { scrapeHackerNewsJobs } from "./scrapers/hackernews.js";
 import { scrapeMozillaJobs } from "./scrapers/mozilla.js";
 import { scrapeSpotifyJobs } from "./scrapers/spotify.js";
-import { scrapeAtlassianJobs } from "./scrapers/atlassian.js";
+import { ScrapSlackJobs } from "./scrapers/Slack.js";  // Include Slack scraper
+import { scrapeAtlassianJobs } from "./scrapers/atlassian.js";  // Include Atlassian scraper
 
 async function main() {
   let browser;
@@ -39,13 +40,15 @@ async function main() {
 
     // const mozillaJobs = await scrapeMozillaJobs(browser);
     // logger.info(`Found ${mozillaJobs.length} Mozilla jobs`);
-    //
 
-    const spotifyJobs = await scrapeSpotifyJobs(browser);
-    logger.info(`Found ${spotifyJobs.length} Spotify jobs`);
+    // const spotifyJobs = await scrapeSpotifyJobs(browser);
+    // logger.info(`Found ${spotifyJobs.length} Spotify jobs`);
 
-    const atlassianJobs = await scrapeAtlassianJobs(browser);
-    logger.info(`Found ${atlassianJobs.length} Atlassian jobs`);
+    const slackJobs = await ScrapSlackJobs(browser);
+    logger.info(`Found ${slackJobs.length} Slack Jobs`);
+
+    // const atlassianJobs = await scrapeAtlassianJobs(browser);
+    // logger.info(`Found ${atlassianJobs.length} Atlassian jobs`);
 
     // Combine all jobs
     let allJobs = [
@@ -55,12 +58,16 @@ async function main() {
       // ...paytmJobs,
       // ...hackerNewsJobs,
       // ...mozillaJobs,
-      ...spotifyJobs,
-      ...atlassianJobs,
+      // ...spotifyJobs,
+      // ...lyftJobs,
+      ...slackJobs,
+      // ...spotifyJobs,
+      // ...atlassianJobs,
     ];
 
     // Filter and process jobs
     allJobs = allJobs.map(validateAndNormalizeJob).filter(Boolean);
+
 
     logger.info(`Total valid jobs to be sent: ${allJobs.length}`);
 
@@ -70,8 +77,13 @@ async function main() {
     });
 
     // Send jobs to API
-    const result = await sendJobsToAPI(allJobs);
-    logger.info(`API response: ${JSON.stringify(result)}`);
+    try {
+      const result = await sendJobsToAPI(allJobs);
+      logger.info(`API response: ${JSON.stringify(result)}`);
+  } catch (error) {
+      logger.error("Error while you sending the jobs to Api endpoint", error.response ? error.response.data : error.message);
+  }
+  
 
     // Console output for all jobs
     console.table(allJobs);
