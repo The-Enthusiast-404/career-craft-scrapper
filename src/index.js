@@ -10,6 +10,7 @@ import { scrapeHackerNewsJobs } from "./scrapers/hackernews.js";
 import { scrapeMozillaJobs } from "./scrapers/mozilla.js";
 import { scrapeSpotifyJobs } from "./scrapers/spotify.js";
 import { scrapeAtlassianJobs } from "./scrapers/atlassian.js";
+import { scrapeDropbox } from "./scrapers/dropbox.js";
 
 async function main() {
   let browser;
@@ -47,6 +48,8 @@ async function main() {
     const atlassianJobs = await scrapeAtlassianJobs(browser);
     logger.info(`Found ${atlassianJobs.length} Atlassian jobs`);
 
+    const dropboxJobs = await scrapeDropbox(browser);
+
     // Combine all jobs
     let allJobs = [
       // ...phonePeJobs,
@@ -57,6 +60,7 @@ async function main() {
       // ...mozillaJobs,
       ...spotifyJobs,
       ...atlassianJobs,
+      ...dropboxJobs,
     ];
 
     // Filter and process jobs
