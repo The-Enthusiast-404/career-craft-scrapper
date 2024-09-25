@@ -9,7 +9,6 @@ import { validateAndNormalizeJob } from "./utils/jobUtils.js";
 import { scrapeHackerNewsJobs } from "./scrapers/hackernews.js";
 import { scrapeMozillaJobs } from "./scrapers/mozilla.js";
 import { scrapeSpotifyJobs } from "./scrapers/spotify.js";
-import {ScrapLyfJobs} from './scrapers/lyft.js'
 import { ScrapSlackJobs } from "./scrapers/Slack.js";
 
 
@@ -41,12 +40,6 @@ async function main() {
 
     // const mozillaJobs = await scrapeMozillaJobs(browser);
     // logger.info(`Found ${mozillaJobs.length} Mozilla jobs`);
-
-    //Scrapping the lyft jobss
-
-    // const lyftJobs = await ScrapLyfJobs(browser);
-    // console.log('Lyft Jobs:');
-    // logger.info(`Found ${lyftJobs.length} Lyft Jobs`);
 
     // const spotifyJobs = await scrapeSpotifyJobs(browser);
     // logger.info(`Found ${spotifyJobs.length} Spotify jobs`);
