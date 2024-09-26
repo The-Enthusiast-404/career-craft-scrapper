@@ -8,5 +8,6 @@ export function validateAndNormalizeJob(job) {
     title: job.title.trim(),
     company: job.company.trim(),
     url: job.url ? job.url.trim() : "",
+    description: job.description ? job.description.trim() : "",
   };
 }
