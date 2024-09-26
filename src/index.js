@@ -40,9 +40,9 @@ async function main() {
     // logger.info(`Found ${hackerNewsJobs.length} Hacker News jobs`);
 
     // // Scrape Mozilla jobs
-    logger.info("Starting Mozilla job scraping");
-    const mozillaJobs = await scrapeMozillaJobs(browser);
-    logger.info(`Found ${mozillaJobs.length} Mozilla jobs with descriptions`);
+    // logger.info("Starting Mozilla job scraping");
+    // const mozillaJobs = await scrapeMozillaJobs(browser);
+    // logger.info(`Found ${mozillaJobs.length} Mozilla jobs with descriptions`);
 
     // // Scrape Spotify jobs
     // const spotifyJobs = await scrapeSpotifyJobs(browser);
@@ -53,8 +53,9 @@ async function main() {
     // logger.info(`Found ${dropboxJobs.length} Dropbox jobs`);
 
     // // Scrape Slack jobs
-    // const slackJobs = await ScrapSlackJobs(browser);
-    // logger.info(`Found ${slackJobs.length} Slack Jobs`);
+    logger.info("Starting Slack job scraping");
+    const slackJobs = await ScrapSlackJobs(browser);
+    logger.info(`Found ${slackJobs.length} Slack jobs with descriptions`);
 
     // // Scrape Atlassian jobs
     // const atlassianJobs = await scrapeAtlassianJobs(browser);
@@ -67,10 +68,10 @@ async function main() {
       // ...airbnbJobs,
       // ...paytmJobs,
       // ...hackerNewsJobs,
-      ...mozillaJobs,
+      // ...mozillaJobs,
       // ...spotifyJobs,
       // ...dropboxJobs,
-      // ...slackJobs,
+      ...slackJobs,
       // ...atlassianJobs,
     ];
 
