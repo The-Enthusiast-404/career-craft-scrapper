@@ -45,9 +45,9 @@ async function main() {
     // logger.info(`Found ${mozillaJobs.length} Mozilla jobs with descriptions`);
 
     // // Scrape Spotify jobs
-    logger.info("Starting Spotify job scraping");
-    const spotifyJobs = await scrapeSpotifyJobs(browser);
-    logger.info(`Found ${spotifyJobs.length} Spotify jobs with descriptions`);
+    // logger.info("Starting Spotify job scraping");
+    // const spotifyJobs = await scrapeSpotifyJobs(browser);
+    // logger.info(`Found ${spotifyJobs.length} Spotify jobs with descriptions`);
 
     // // Scrape Dropbox jobs
     // const dropboxJobs = await scrapeDropbox(browser);
@@ -59,8 +59,9 @@ async function main() {
     // logger.info(`Found ${slackJobs.length} Slack jobs with descriptions`);
 
     // // Scrape Atlassian jobs
-    // const atlassianJobs = await scrapeAtlassianJobs(browser);
-    // logger.info(`Found ${atlassianJobs.length} Atlassian jobs`);
+    logger.info("Starting Atlassian job scraping");
+    const atlassianJobs = await scrapeAtlassianJobs(browser);
+    logger.info(`Found ${atlassianJobs.length} Atlassian jobs with details`);
 
     // Combine all jobs
     let allJobs = [
@@ -70,10 +71,10 @@ async function main() {
       // ...paytmJobs,
       // ...hackerNewsJobs,
       // ...mozillaJobs,
-      ...spotifyJobs,
+      // ...spotifyJobs,
       // ...dropboxJobs,
       // ...slackJobs,
-      // ...atlassianJobs,
+      ...atlassianJobs,
     ];
 
     // Filter and process jobs
