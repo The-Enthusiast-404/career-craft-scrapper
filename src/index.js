@@ -31,17 +31,18 @@ async function main() {
     // logger.info(`Found ${airbnbJobs.length} Airbnb jobs`);
 
     // // Scrape Paytm jobs
-    logger.info("Starting Paytm job scraping");
-    const paytmJobs = await scrapePaytmJobs(browser);
-    logger.info(`Found ${paytmJobs.length} Paytm jobs with descriptions`);
+    // logger.info("Starting Paytm job scraping");
+    // const paytmJobs = await scrapePaytmJobs(browser);
+    // logger.info(`Found ${paytmJobs.length} Paytm jobs with descriptions`);
 
     // // Scrape Hacker News jobs
     // const hackerNewsJobs = await scrapeHackerNewsJobs();
     // logger.info(`Found ${hackerNewsJobs.length} Hacker News jobs`);
 
     // // Scrape Mozilla jobs
-    // const mozillaJobs = await scrapeMozillaJobs(browser);
-    // logger.info(`Found ${mozillaJobs.length} Mozilla jobs`);
+    logger.info("Starting Mozilla job scraping");
+    const mozillaJobs = await scrapeMozillaJobs(browser);
+    logger.info(`Found ${mozillaJobs.length} Mozilla jobs with descriptions`);
 
     // // Scrape Spotify jobs
     // const spotifyJobs = await scrapeSpotifyJobs(browser);
@@ -64,9 +65,9 @@ async function main() {
       // ...phonePeJobs,
       // ...flipkartJobs,
       // ...airbnbJobs,
-      ...paytmJobs,
+      // ...paytmJobs,
       // ...hackerNewsJobs,
-      // ...mozillaJobs,
+      ...mozillaJobs,
       // ...spotifyJobs,
       // ...dropboxJobs,
       // ...slackJobs,
