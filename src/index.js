@@ -9,6 +9,7 @@ import { validateAndNormalizeJob } from "./utils/jobUtils.js";
 import { scrapeHackerNewsJobs } from "./scrapers/hackernews.js";
 import { scrapeMozillaJobs } from "./scrapers/mozilla.js";
 import { scrapeSpotifyJobs } from "./scrapers/spotify.js";
+import { scrapeShopifyJobs } from "./scrapers/shopify.js";
 
 async function main() {
   let browser;
@@ -43,6 +44,9 @@ async function main() {
     const spotifyJobs = await scrapeSpotifyJobs(browser);
     logger.info(`Found ${spotifyJobs.length} Spotify jobs`);
 
+    const shopifyJobs = await scrapeShopifyJobs(browser);
+    logger.info(`Found ${shopifyJobs.length} Spotify jobs`);
+
     // Combine all jobs
     let allJobs = [
       // ...phonePeJobs,
@@ -52,6 +56,7 @@ async function main() {
       // ...hackerNewsJobs,
       // ...mozillaJobs,
       ...spotifyJobs,
+      ...shopifyJobs,
     ];
 
     // Filter and process jobs
