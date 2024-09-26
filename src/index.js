@@ -9,6 +9,7 @@ import { validateAndNormalizeJob } from "./utils/jobUtils.js";
 import { scrapeHackerNewsJobs } from "./scrapers/hackernews.js";
 import { scrapeMozillaJobs } from "./scrapers/mozilla.js";
 import { scrapeSpotifyJobs } from "./scrapers/spotify.js";
+import { scrapeDropbox } from "./scrapers/dropbox.js";
 import { ScrapSlackJobs } from "./scrapers/Slack.js";  // Include Slack scraper
 import { scrapeAtlassianJobs } from "./scrapers/atlassian.js";  // Include Atlassian scraper
 
@@ -41,14 +42,16 @@ async function main() {
     // const mozillaJobs = await scrapeMozillaJobs(browser);
     // logger.info(`Found ${mozillaJobs.length} Mozilla jobs`);
 
-    // const spotifyJobs = await scrapeSpotifyJobs(browser);
-    // logger.info(`Found ${spotifyJobs.length} Spotify jobs`);
+    const spotifyJobs = await scrapeSpotifyJobs(browser);
+    logger.info(`Found ${spotifyJobs.length} Spotify jobs`);
 
     const slackJobs = await ScrapSlackJobs(browser);
     logger.info(`Found ${slackJobs.length} Slack Jobs`);
 
-    // const atlassianJobs = await scrapeAtlassianJobs(browser);
-    // logger.info(`Found ${atlassianJobs.length} Atlassian jobs`);
+    const atlassianJobs = await scrapeAtlassianJobs(browser);
+    logger.info(`Found ${atlassianJobs.length} Atlassian jobs`);
+
+    const dropboxJobs = await scrapeDropbox(browser);
 
     // Combine all jobs
     let allJobs = [
@@ -58,11 +61,10 @@ async function main() {
       // ...paytmJobs,
       // ...hackerNewsJobs,
       // ...mozillaJobs,
-      // ...spotifyJobs,
-      // ...lyftJobs,
       ...slackJobs,
-      // ...spotifyJobs,
-      // ...atlassianJobs,
+      ...spotifyJobs,
+      ...atlassianJobs,
+      ...dropboxJobs,
     ];
 
     // Filter and process jobs
