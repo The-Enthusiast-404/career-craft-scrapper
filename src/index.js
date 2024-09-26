@@ -45,17 +45,18 @@ async function main() {
     // logger.info(`Found ${mozillaJobs.length} Mozilla jobs with descriptions`);
 
     // // Scrape Spotify jobs
-    // const spotifyJobs = await scrapeSpotifyJobs(browser);
-    // logger.info(`Found ${spotifyJobs.length} Spotify jobs`);
+    logger.info("Starting Spotify job scraping");
+    const spotifyJobs = await scrapeSpotifyJobs(browser);
+    logger.info(`Found ${spotifyJobs.length} Spotify jobs with descriptions`);
 
     // // Scrape Dropbox jobs
     // const dropboxJobs = await scrapeDropbox(browser);
     // logger.info(`Found ${dropboxJobs.length} Dropbox jobs`);
 
     // // Scrape Slack jobs
-    logger.info("Starting Slack job scraping");
-    const slackJobs = await ScrapSlackJobs(browser);
-    logger.info(`Found ${slackJobs.length} Slack jobs with descriptions`);
+    // logger.info("Starting Slack job scraping");
+    // const slackJobs = await ScrapSlackJobs(browser);
+    // logger.info(`Found ${slackJobs.length} Slack jobs with descriptions`);
 
     // // Scrape Atlassian jobs
     // const atlassianJobs = await scrapeAtlassianJobs(browser);
@@ -69,9 +70,9 @@ async function main() {
       // ...paytmJobs,
       // ...hackerNewsJobs,
       // ...mozillaJobs,
-      // ...spotifyJobs,
+      ...spotifyJobs,
       // ...dropboxJobs,
-      ...slackJobs,
+      // ...slackJobs,
       // ...atlassianJobs,
     ];
 

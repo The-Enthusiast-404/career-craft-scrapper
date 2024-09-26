@@ -8,7 +8,6 @@ const JOB_CARD_SELECTOR = ".entry_container__eT9IU";
 export async function scrapeSpotifyJobs(browser) {
   const page = await browser.newPage();
   let allJobs = [];
-
   try {
     logger.info("Navigating to Spotify jobs page");
     await page.goto(SPOTIFY_JOBS_URL, { waitUntil: "networkidle0" });
@@ -19,6 +18,7 @@ export async function scrapeSpotifyJobs(browser) {
         const jobCards = document.querySelectorAll(jobCardSelector);
         return Array.from(jobCards).map((card) => {
           const titleElement = card.querySelector(".entry_title__Q0z3u");
+          const locationElement = card.querySelector(".entry_location__CFAvj");
           return {
             title: titleElement ? titleElement.textContent.trim() : "",
             company: "Spotify",
@@ -26,6 +26,7 @@ export async function scrapeSpotifyJobs(browser) {
               ? "https://www.lifeatspotify.com" +
                 titleElement.getAttribute("href")
               : "",
+            location: locationElement ? locationElement.textContent.trim() : "",
           };
         });
       }, JOB_CARD_SELECTOR);
@@ -60,7 +61,36 @@ export async function scrapeSpotifyJobs(browser) {
       hasMore = await loadMoreJobs();
     }
 
-    logger.info(`Found ${allJobs.length} Spotify jobs`);
+    logger.info(
+      `Found ${allJobs.length} Spotify jobs. Scraping descriptions...`,
+    );
+
+    // Scrape job descriptions
+    for (const job of allJobs) {
+      try {
+        await page.goto(job.url, { waitUntil: "networkidle0" });
+        job.description = await page.evaluate(() => {
+          const descriptionElement = document.querySelector(
+            ".singlejob_maxWidth__0SwoF",
+          );
+          return descriptionElement ? descriptionElement.innerText.trim() : "";
+        });
+        job.jobType = await page.evaluate(() => {
+          const jobTypeElement = document.querySelector(
+            ".col-12:nth-child(2) .size-6",
+          );
+          return jobTypeElement ? jobTypeElement.textContent.trim() : "";
+        });
+        logger.info(`Scraped description for job: ${job.title}`);
+      } catch (error) {
+        logger.error(
+          `Error scraping description for job ${job.title}: ${error.message}`,
+        );
+        job.description = "";
+        job.jobType = "";
+      }
+    }
+
     return allJobs;
   } catch (error) {
     logger.error(`Error scraping Spotify jobs: ${error.message}`);
