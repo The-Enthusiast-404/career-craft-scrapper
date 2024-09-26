@@ -36,7 +36,7 @@ export async function scrapeDropbox(browser) {
             url,
           };
         });
-      }, selector, findJobListing);
+      }, selector);
     };
 
     const jobs = await extractJobs();
