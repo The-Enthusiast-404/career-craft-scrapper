@@ -27,8 +27,9 @@ async function main() {
     // logger.info(`Found ${flipkartJobs.length} Flipkart jobs`);
 
     // // Scrape Airbnb jobs
-    // const airbnbJobs = await scrapeAirbnbJobs(browser);
-    // logger.info(`Found ${airbnbJobs.length} Airbnb jobs`);
+    logger.info("Starting Airbnb job scraping");
+    const airbnbJobs = await scrapeAirbnbJobs(browser);
+    logger.info(`Found ${airbnbJobs.length} Airbnb jobs with details`);
 
     // // Scrape Paytm jobs
     // logger.info("Starting Paytm job scraping");
@@ -59,22 +60,22 @@ async function main() {
     // logger.info(`Found ${slackJobs.length} Slack jobs with descriptions`);
 
     // // Scrape Atlassian jobs
-    logger.info("Starting Atlassian job scraping");
-    const atlassianJobs = await scrapeAtlassianJobs(browser);
-    logger.info(`Found ${atlassianJobs.length} Atlassian jobs with details`);
+    // logger.info("Starting Atlassian job scraping");
+    // const atlassianJobs = await scrapeAtlassianJobs(browser);
+    // logger.info(`Found ${atlassianJobs.length} Atlassian jobs with details`);
 
     // Combine all jobs
     let allJobs = [
       // ...phonePeJobs,
       // ...flipkartJobs,
-      // ...airbnbJobs,
+      ...airbnbJobs,
       // ...paytmJobs,
       // ...hackerNewsJobs,
       // ...mozillaJobs,
       // ...spotifyJobs,
       // ...dropboxJobs,
       // ...slackJobs,
-      ...atlassianJobs,
+      // ...atlassianJobs,
     ];
 
     // Filter and process jobs

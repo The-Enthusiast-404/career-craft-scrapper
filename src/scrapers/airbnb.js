@@ -16,32 +16,49 @@ export async function scrapeAirbnbJobs(browser) {
 
     let hasNextPage = true;
     let pageNum = 1;
+
     while (hasNextPage) {
       logger.info(`Scraping Airbnb jobs page ${pageNum}`);
 
-      // Wait for the job listings to load
       await page.waitForSelector(".inner-grid", {
         timeout: NAVIGATION_TIMEOUT,
       });
 
-      // Scroll to load all job listings on the current page
       await autoScroll(page);
 
-      // Extract jobs from the current page
       const jobs = await extractJobsFromPage(page);
       allJobs = allJobs.concat(jobs);
 
       logger.info(`Found ${jobs.length} jobs on page ${pageNum}`);
 
-      // Check if there's a next page and navigate to it
       hasNextPage = await goToNextPage(page);
       pageNum++;
 
-      // Add a small delay between page navigations
       await delay(2000);
     }
 
-    logger.info(`Found ${allJobs.length} Airbnb jobs in total`);
+    logger.info(`Found ${allJobs.length} Airbnb jobs. Scraping details...`);
+
+    // Scrape job details
+    for (const job of allJobs) {
+      try {
+        await page.goto(job.url, {
+          waitUntil: "networkidle0",
+          timeout: NAVIGATION_TIMEOUT,
+        });
+        const details = await extractJobDetails(page);
+        Object.assign(job, details);
+        logger.info(`Scraped details for job: ${job.title}`);
+      } catch (error) {
+        logger.error(
+          `Error scraping details for job ${job.title}: ${error.message}`,
+        );
+      }
+    }
+
+    logger.info(
+      `Completed scraping ${allJobs.length} Airbnb jobs with details`,
+    );
     return allJobs;
   } catch (error) {
     logger.error(`Error scraping Airbnb jobs: ${error.message}`);
@@ -49,6 +66,45 @@ export async function scrapeAirbnbJobs(browser) {
   } finally {
     await page.close();
   }
+}
+
+async function extractJobsFromPage(page) {
+  return page.evaluate(() => {
+    const jobElements = document.querySelectorAll(".inner-grid");
+    return Array.from(jobElements).map((element) => {
+      const titleElement = element.querySelector("h3 a");
+      const locationElement = element.querySelector(".location");
+      return {
+        title: titleElement ? titleElement.textContent.trim() : "",
+        company: "Airbnb",
+        url: titleElement ? titleElement.href : "",
+        location: locationElement ? locationElement.textContent.trim() : "",
+      };
+    });
+  });
+}
+
+async function extractJobDetails(page) {
+  return page.evaluate(() => {
+    const descriptionElement = document.querySelector(".job-detail.active");
+    const departmentElement = document.querySelector(".content-intro");
+
+    let department = "";
+    if (departmentElement) {
+      const departmentMatch =
+        departmentElement.textContent.match(/This\s+(.*?)\s+role/i);
+      if (departmentMatch) {
+        department = departmentMatch[1].trim();
+      }
+    }
+
+    return {
+      description: descriptionElement
+        ? descriptionElement.innerText.trim()
+        : "",
+      department: department,
+    };
+  });
 }
 
 async function navigateWithRetry(page, url, retries = 0) {
@@ -67,20 +123,6 @@ async function navigateWithRetry(page, url, retries = 0) {
       );
     }
   }
-}
-
-async function extractJobsFromPage(page) {
-  return page.evaluate(() => {
-    const jobElements = document.querySelectorAll(".inner-grid");
-    return Array.from(jobElements).map((element) => {
-      const titleElement = element.querySelector("h3 a");
-      return {
-        title: titleElement ? titleElement.textContent.trim() : "",
-        company: "Airbnb",
-        url: titleElement ? titleElement.href : "",
-      };
-    });
-  });
 }
 
 async function goToNextPage(page) {
@@ -112,7 +154,6 @@ async function autoScroll(page) {
         const scrollHeight = document.documentElement.scrollHeight;
         window.scrollBy(0, distance);
         totalHeight += distance;
-
         if (totalHeight >= scrollHeight) {
           clearInterval(timer);
           resolve();
@@ -122,7 +163,6 @@ async function autoScroll(page) {
   });
 }
 
-// Custom delay function
 function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
