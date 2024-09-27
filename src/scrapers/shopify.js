@@ -1,7 +1,6 @@
 import puppeteer from "puppeteer";
 import * as cheerio from "cheerio";
-
-import logger from "../utils/logger.js";
+import logger from "../utils/logger.js"; // Importing the logger
 
 export async function scrapeShopifyJobs(browser) {
   const page = await browser.newPage();
@@ -9,15 +8,24 @@ export async function scrapeShopifyJobs(browser) {
   logger.info("Navigating to Shopify jobs page");
 
   try {
+    // Navigate to Shopify careers page
     await page.goto("https://www.shopify.com/careers", {
       waitUntil: "networkidle2",
     });
 
+    // Get the page content
     const content = await page.content();
+
+    // Load content into Cheerio
     const $ = cheerio.load(content);
-    const baseUrl = "https://www.shopify.com";
+
+    // Initialize an array to hold organized jobs
     const jobs = [];
 
+    // Base URL for constructing absolute URLs
+    const baseUrl = "https://www.shopify.com";
+
+    // Iterate over div.mb-8 and div.mb-10 to extract job listings
     $("div.mb-8, div.mb-10").each((index, element) => {
       const jobTitles = [];
       const jobUrls = [];
@@ -29,12 +37,14 @@ export async function scrapeShopifyJobs(browser) {
         .each((i, el) => {
           jobTitles.push($(el).text().trim());
         });
+
       $(element)
         .find("a")
         .each((i, el) => {
           const relativeUrl = $(el).attr("href");
-          jobUrls.push(relativeUrl ? baseUrl + relativeUrl : "#");
+          jobUrls.push(relativeUrl ? baseUrl + relativeUrl : "#"); // Prepend base URL
         });
+
       $(element)
         .find("div.flex.items-center span")
         .each((i, el) => {
@@ -45,14 +55,47 @@ export async function scrapeShopifyJobs(browser) {
       for (let i = 0; i < jobTitles.length; i++) {
         jobs.push({
           title: jobTitles[i] || "No Title",
-          url: jobUrls[i] || "#",
+          url: jobUrls[i] || "#", // Fallback URL
           location: jobLocations[i] || "Location not specified",
-          company: "Shopify",
+          company: "Shopify", // Company name
+          description: "", // Placeholder for job description
         });
       }
     });
 
-    logger.info(`Scraped ${jobs.length} Shopify jobs`);
+    logger.info(`Scraped ${jobs.length} Shopify jobs. Scraping details...`);
+
+    // Scrape job descriptions
+    for (const job of jobs) {
+      try {
+        if (job.url && job.url !== "#") {
+          await page.goto(job.url, { waitUntil: "networkidle2" });
+
+          // Ensure the job description section is loaded
+          await page.waitForSelector('div[itemprop="description"] p');
+
+          // Get page content again to load job description
+          const jobPageContent = await page.content();
+          const $$ = cheerio.load(jobPageContent);
+
+          // Extract job description from the first <p> inside itemprop="description"
+          const jobDescription = $$('div[itemprop="description"] p')
+            .first()
+            .text()
+            .trim();
+
+          job.description = jobDescription || "No description available";
+          logger.info(`Scraped description for job: ${job.title}`);
+        }
+      } catch (error) {
+        logger.error(
+          `Error scraping job description for ${job.title}: ${error.message}`
+        );
+        job.description = "Error retrieving description";
+      }
+    }
+
+    // Return the jobs array with titles, URLs, locations, and descriptions
     return jobs;
   } catch (error) {
     logger.error(`Error while scraping Shopify jobs: ${error.message}`);
