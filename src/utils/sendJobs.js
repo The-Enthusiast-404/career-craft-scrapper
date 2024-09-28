@@ -1,7 +1,7 @@
 import axios from "axios";
 import logger from "./logger.js";
 
-const API_URL = "http://localhost:8080/jobs/bulk";
+const API_URL = "http://localhost:8081/jobs/bulk";
 
 export async function sendJobsToAPI(jobs) {
   try {
