@@ -12,6 +12,7 @@ import { scrapeAtlassianJobs } from "./scrapers/atlassian.js";
 import logger from "./utils/logger.js";
 import { sendJobsToAPI } from "./utils/sendJobs.js";
 import { validateAndNormalizeJob } from "./utils/jobUtils.js";
+import { scrapeShopifyJobs } from "./scrapers/shopify.js";
 
 async function main() {
   let browser;
@@ -27,9 +28,9 @@ async function main() {
     // logger.info(`Found ${flipkartJobs.length} Flipkart jobs`);
 
     // // Scrape Airbnb jobs
-    logger.info("Starting Airbnb job scraping");
-    const airbnbJobs = await scrapeAirbnbJobs(browser);
-    logger.info(`Found ${airbnbJobs.length} Airbnb jobs with details`);
+    //logger.info("Starting Airbnb job scraping");
+    //const airbnbJobs = await scrapeAirbnbJobs(browser);
+    //logger.info(`Found ${airbnbJobs.length} Airbnb jobs with details`);
 
     // // Scrape Paytm jobs
     // logger.info("Starting Paytm job scraping");
@@ -64,11 +65,15 @@ async function main() {
     // const atlassianJobs = await scrapeAtlassianJobs(browser);
     // logger.info(`Found ${atlassianJobs.length} Atlassian jobs with details`);
 
+    //scrape shopify jobs
+    const shopifyjobs = await scrapeShopifyJobs(browser);
+    logger.info(`Found ${shopifyjobs.length} shopify jobs`);
+
     // Combine all jobs
     let allJobs = [
       // ...phonePeJobs,
       // ...flipkartJobs,
-      ...airbnbJobs,
+      //...airbnbJobs,
       // ...paytmJobs,
       // ...hackerNewsJobs,
       // ...mozillaJobs,
@@ -76,6 +81,7 @@ async function main() {
       // ...dropboxJobs,
       // ...slackJobs,
       // ...atlassianJobs,
+      ...shopifyjobs,
     ];
 
     // Filter and process jobs
@@ -94,7 +100,7 @@ async function main() {
     } catch (error) {
       logger.error(
         "Error while sending the jobs to API endpoint",
-        error.response ? error.response.data : error.message,
+        error.response ? error.response.data : error.message
       );
     }
 
