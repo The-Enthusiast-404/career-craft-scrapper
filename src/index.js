@@ -31,9 +31,13 @@ async function main() {
     // const airbnbJobs = await scrapeAirbnbJobs(browser);
     // logger.info(`Found ${airbnbJobs.length} Airbnb jobs with descriptions`);
 
-    logger.info("Starting Mozilla job scrapping");
-    const mozillaJobs = await scrapeMozillaJobs(browser);
-    logger.info(`Found ${mozillaJobs.length} Mozilla jobs with descriptions`);
+    // logger.info("Starting Mozilla job scrapping");
+    // const mozillaJobs = await scrapeMozillaJobs(browser);
+    // logger.info(`Found ${mozillaJobs.length} Mozilla jobs with descriptions`);
+
+    logger.info("Starting Spotify job scrapping");
+    const spotifyJobs = await scrapeSpotifyJobs(browser);
+    logger.info(`Found ${spotifyJobs.length} Spotify jobs with descriptions`);
 
     // logger.info("Starting Paytm job scraping");
     // const paytmJobs = await scrapePaytmJobs(browser);
@@ -45,7 +49,8 @@ async function main() {
       // ...dropboxJobs,
       // ...slackJobs,
       // ...airbnbJobs,
-      ...mozillaJobs,
+      // ...mozillaJobs,
+      ...spotifyJobs,
       // Add other job arrays here when uncommented
     ];
 

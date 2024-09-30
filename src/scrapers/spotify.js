@@ -62,32 +62,20 @@ export async function scrapeSpotifyJobs(browser) {
     }
 
     logger.info(
-      `Found ${allJobs.length} Spotify jobs. Scraping descriptions...`,
+      `Found ${allJobs.length} Spotify jobs. Scraping detailed information...`,
     );
 
-    // Scrape job descriptions
+    // Scrape detailed job information
     for (const job of allJobs) {
       try {
         await page.goto(job.url, { waitUntil: "networkidle0" });
-        job.description = await page.evaluate(() => {
-          const descriptionElement = document.querySelector(
-            ".singlejob_maxWidth__0SwoF",
-          );
-          return descriptionElement ? descriptionElement.innerText.trim() : "";
-        });
-        job.jobType = await page.evaluate(() => {
-          const jobTypeElement = document.querySelector(
-            ".col-12:nth-child(2) .size-6",
-          );
-          return jobTypeElement ? jobTypeElement.textContent.trim() : "";
-        });
-        logger.info(`Scraped description for job: ${job.title}`);
+        const jobDetails = await extractJobDetails(page);
+        Object.assign(job, jobDetails);
+        logger.info(`Scraped details for job: ${job.title}`);
       } catch (error) {
         logger.error(
-          `Error scraping description for job ${job.title}: ${error.message}`,
+          `Error scraping details for job ${job.title}: ${error.message}`,
         );
-        job.description = "";
-        job.jobType = "";
       }
     }
 
@@ -98,4 +86,52 @@ export async function scrapeSpotifyJobs(browser) {
   } finally {
     await page.close();
   }
+}
+
+async function extractJobDetails(page) {
+  return page.evaluate(() => {
+    const getElementText = (selector) => {
+      const element = document.querySelector(selector);
+      return element ? element.textContent.trim() : "Not specified";
+    };
+
+    const getListItems = (selector) => {
+      const items = document.querySelectorAll(selector);
+      return Array.from(items).map((item) => item.textContent.trim());
+    };
+
+    const description = getElementText(".singlejob_maxWidth__0SwoF");
+
+    return {
+      description: description,
+      category: getElementText(".tags_container__mE0BD.tags_color__F6uPG p"),
+      jobType: getElementText(".col-12:nth-child(2) .size-6"),
+      responsibilities: getListItems(
+        ".singlejob_maxWidth__0SwoF ul:nth-of-type(1) li",
+      ),
+      qualifications: getListItems(
+        ".singlejob_maxWidth__0SwoF ul:nth-of-type(2) li",
+      ),
+      benefits: getListItems(
+        ".row.mt-l.mt-mobile-xl .perks_container__E7jyf p",
+      ),
+      remoteType: description.includes("distributed")
+        ? "Remote Eligible"
+        : "Not specified",
+      experience: (() => {
+        const expMatch = description.match(/(\d+\+?\s*years?)[^.]*experience/i);
+        return expMatch ? expMatch[1] : "Not specified";
+      })(),
+      education: (() => {
+        const eduMatch = description.match(/([^.]+degree[^.]+\.)/i);
+        return eduMatch ? eduMatch[1].trim() : "Not specified";
+      })(),
+      salary: "Not specified", // Salary information not provided in the sample HTML
+      applicationDeadline: "Not specified", // Application deadline not provided in the sample HTML
+      postedDate: "Not specified", // Posted date not provided in the sample HTML
+      companyDescription: getElementText(
+        ".row.mb-100.mt-l.mb-l .closingtext_text__B9RMi",
+      ),
+    };
+  });
 }
