@@ -12,16 +12,32 @@ import { scrapeAtlassianJobs } from "./scrapers/atlassian.js";
 import logger from "./utils/logger.js";
 import { sendJobsToAPI } from "./utils/sendJobs.js";
 import { validateAndNormalizeJob } from "./utils/jobUtils.js";
+import { scrapeShopifyJobs } from "./scrapers/shopify.js";
 
 async function main() {
   let browser;
   try {
     browser = await launchBrowser();
 
+
     // logger.info("Starting Dropbox job scrapping");
     // const dropboxJobs = await scrapeDropbox(browser);
     // logger.info(`Found ${dropboxJobs.length} Dropbox jobs with descriptions`);
     //
+
+    // Scrape PhonePe jobs
+    // const phonePeJobs = await scrapePhonePeJobs(browser);
+    // logger.info(`Found ${phonePeJobs.length} PhonePe jobs`);
+
+    // // Scrape Flipkart jobs
+    // const flipkartJobs = await scrapeFlipkartJobs(browser);
+    // logger.info(`Found ${flipkartJobs.length} Flipkart jobs`);
+
+    // // Scrape Airbnb jobs
+    //logger.info("Starting Airbnb job scraping");
+    //const airbnbJobs = await scrapeAirbnbJobs(browser);
+    //logger.info(`Found ${airbnbJobs.length} Airbnb jobs with details`);
+
 
     // logger.info("Starting Slack job scraping");
     // const slackJobs = await scrapeSlackJobs(browser);
@@ -43,15 +59,29 @@ async function main() {
     // const paytmJobs = await scrapePaytmJobs(browser);
     // logger.info(`Found ${paytmJobs.length} Paytm jobs with descriptions`);
 
+    //scrape shopify jobs
+    const shopifyjobs = await scrapeShopifyJobs(browser);
+    logger.info(`Found ${shopifyjobs.length} shopify jobs`);
+
     // Combine all jobs
     let allJobs = [
+
+      // ...phonePeJobs,
+      // ...flipkartJobs,
+      //...airbnbJobs,
+
       // ...paytmJobs,
       // ...dropboxJobs,
       // ...slackJobs,
+
       // ...airbnbJobs,
       // ...mozillaJobs,
       ...spotifyJobs,
       // Add other job arrays here when uncommented
+
+      // ...atlassianJobs,
+      ...shopifyjobs,
+
     ];
 
     // Filter and process jobs
@@ -85,7 +115,7 @@ async function main() {
     } catch (error) {
       logger.error(
         "Error while sending the jobs to API endpoint",
-        error.response ? error.response.data : error.message,
+        error.response ? error.response.data : error.message
       );
     }
   } catch (error) {
