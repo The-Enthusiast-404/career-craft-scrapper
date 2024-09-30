@@ -7,7 +7,7 @@ import { scrapeHackerNewsJobs } from "./scrapers/hackernews.js";
 import { scrapeMozillaJobs } from "./scrapers/mozilla.js";
 import { scrapeSpotifyJobs } from "./scrapers/spotify.js";
 import { scrapeDropbox } from "./scrapers/dropbox.js";
-import { ScrapSlackJobs } from "./scrapers/Slack.js";
+import { scrapeSlackJobs } from "./scrapers/Slack.js";
 import { scrapeAtlassianJobs } from "./scrapers/atlassian.js";
 import logger from "./utils/logger.js";
 import { sendJobsToAPI } from "./utils/sendJobs.js";
@@ -18,9 +18,14 @@ async function main() {
   try {
     browser = await launchBrowser();
 
-    logger.info("Starting Dropbox job scrapping");
-    const dropboxJobs = await scrapeDropbox(browser);
-    logger.info(`Found ${dropboxJobs.length} Dropbox jobs with descriptions`);
+    // logger.info("Starting Dropbox job scrapping");
+    // const dropboxJobs = await scrapeDropbox(browser);
+    // logger.info(`Found ${dropboxJobs.length} Dropbox jobs with descriptions`);
+    //
+
+    logger.info("Starting Slack job scraping");
+    const slackJobs = await scrapeSlackJobs(browser);
+    logger.info(`Found ${slackJobs.length} Slack jobs with descriptions`);
 
     // logger.info("Starting Paytm job scraping");
     // const paytmJobs = await scrapePaytmJobs(browser);
@@ -29,7 +34,8 @@ async function main() {
     // Combine all jobs
     let allJobs = [
       // ...paytmJobs,
-      ...dropboxJobs,
+      // ...dropboxJobs,
+      ...slackJobs,
       // Add other job arrays here when uncommented
     ];
 
