@@ -86,23 +86,81 @@ async function extractJobsFromPage(page) {
 
 async function extractJobDetails(page) {
   return page.evaluate(() => {
-    const descriptionElement = document.querySelector(".job-detail.active");
-    const departmentElement = document.querySelector(".content-intro");
+    const getElementText = (selector) => {
+      const element = document.querySelector(selector);
+      return element ? element.textContent.trim() : "Not specified";
+    };
 
-    let department = "";
-    if (departmentElement) {
-      const departmentMatch =
-        departmentElement.textContent.match(/This\s+(.*?)\s+role/i);
-      if (departmentMatch) {
-        department = departmentMatch[1].trim();
-      }
-    }
+    const getListItems = (selector) => {
+      const items = document.querySelectorAll(selector);
+      return Array.from(items).map((item) => item.textContent.trim());
+    };
+
+    const findElementByText = (selector, text) => {
+      const elements = document.querySelectorAll(selector);
+      return Array.from(elements).find((el) => el.textContent.includes(text));
+    };
+
+    const description = getElementText(".job-detail.active");
+    const salaryRange = getElementText(".pay-range");
+
+    const extractEducation = () => {
+      const educationElement = findElementByText(
+        ".job-detail.active p, .job-detail.active li",
+        "Bachelor",
+      );
+      return educationElement
+        ? educationElement.textContent.trim()
+        : "Not specified";
+    };
+
+    const extractExperience = () => {
+      const experienceElement = findElementByText(
+        ".job-detail.active p, .job-detail.active li",
+        "years",
+      );
+      return experienceElement
+        ? experienceElement.textContent.trim()
+        : "Not specified";
+    };
 
     return {
-      description: descriptionElement
-        ? descriptionElement.innerText.trim()
-        : "",
-      department: department,
+      title: getElementText("h1.text-size-12"),
+      location: getElementText(".offices span"),
+      department: (() => {
+        const intro = getElementText(".content-intro");
+        const match = intro.match(/This\s+(.*?)\s+role/i);
+        return match ? match[1].trim() : "Not specified";
+      })(),
+      description: description,
+      salary: salaryRange !== "Not specified" ? salaryRange : "Not specified",
+      responsibilities: getListItems(".job-detail.active ul:nth-of-type(2) li"),
+      qualifications: getListItems(".job-detail.active ul:nth-of-type(3) li"),
+      education: extractEducation(),
+      experience: extractExperience(),
+      remoteType: (() => {
+        const locationElement = findElementByText(
+          ".job-detail.active p",
+          "Your Location:",
+        );
+        return locationElement &&
+          locationElement.textContent.includes("Remote Eligible")
+          ? "Remote Eligible"
+          : "Not specified";
+      })(),
+      jobType: "Full-time", // Assuming all Airbnb jobs are full-time
+      postedDate: "Not specified", // This information is not available in the provided HTML
+      applicationDeadline: "Not specified", // This information is not available in the provided HTML
+      companyDescription: getElementText(".content-intro"),
+      benefits: (() => {
+        const benefitsElement = findElementByText(
+          ".job-detail.active p",
+          "How We'll Take Care of You:",
+        );
+        return benefitsElement
+          ? benefitsElement.textContent.trim()
+          : "Not specified";
+      })(),
     };
   });
 }
