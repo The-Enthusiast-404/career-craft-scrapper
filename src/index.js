@@ -18,13 +18,18 @@ async function main() {
   try {
     browser = await launchBrowser();
 
-    logger.info("Starting Paytm job scraping");
-    const paytmJobs = await scrapePaytmJobs(browser);
-    logger.info(`Found ${paytmJobs.length} Paytm jobs with descriptions`);
+    logger.info("Starting Dropbox job scrapping");
+    const dropboxJobs = await scrapeDropbox(browser);
+    logger.info(`Found ${dropboxJobs.length} Dropbox jobs with descriptions`);
+
+    // logger.info("Starting Paytm job scraping");
+    // const paytmJobs = await scrapePaytmJobs(browser);
+    // logger.info(`Found ${paytmJobs.length} Paytm jobs with descriptions`);
 
     // Combine all jobs
     let allJobs = [
-      ...paytmJobs,
+      // ...paytmJobs,
+      ...dropboxJobs,
       // Add other job arrays here when uncommented
     ];
 

@@ -1,14 +1,11 @@
 import logger from "../utils/logger.js";
+import {
+  parseJobDescription,
+  defaultKeywordSets,
+  createKeywordMatcher,
+} from "../utils/jobDescriptionParser.js";
 
 const DROPBOX_JOBS_URL = "https://jobs.dropbox.com/all-jobs";
-const selector = {
-  jobGroup: ".open-positions__listing-group",
-  jobDepartment: ".open-positions__dept-title-link",
-  jobLink: ".open-positions__listing-link",
-  jobLocation: ".open-positions__listing-location",
-  jobTitle: ".open-positions__listing-title",
-  jobDescription: ".jc03-content", // Selector for job description
-};
 
 export async function scrapeDropbox(browser) {
   const page = await browser.newPage();
@@ -16,48 +13,108 @@ export async function scrapeDropbox(browser) {
     logger.info("Navigating to Dropbox jobs page");
     await page.goto(DROPBOX_JOBS_URL, { waitUntil: "networkidle0" });
 
-    // Function to extract jobs from the current page
-    const extractJobs = async () => {
-      const jobs = await page.evaluate((selector) => {
-        const jobLinks = document.querySelectorAll(selector.jobLink);
-        return Array.from(jobLinks).map((element) => {
-          const groupElement = element.closest(selector.jobGroup);
-          const departmentElement = groupElement.querySelector(
-            selector.jobDepartment
-          );
-          const titleElement = element.querySelector(selector.jobTitle);
-          const locationElement = element.querySelector(selector.jobLocation);
-          const url = element.getAttribute("href");
-          return {
-            title: titleElement?.textContent.trim() || "",
-            location: locationElement?.textContent.trim() || "",
-            department: departmentElement?.textContent.trim() || "",
-            company: "Dropbox",
-            url: new URL(url, "https://jobs.dropbox.com").href,
-          };
-        });
-      }, selector);
+    const jobs = await page.evaluate(() => {
+      const jobElements = document.querySelectorAll(
+        ".open-positions__listing-link",
+      );
+      return Array.from(jobElements).map((element) => ({
+        title:
+          element
+            .querySelector(".open-positions__listing-title")
+            ?.textContent.trim() || "",
+        url: element.href,
+        company: "Dropbox",
+        location:
+          element
+            .querySelector(".open-positions__listing-location")
+            ?.textContent.trim() || "",
+        department:
+          element
+            .closest(".open-positions__listing-group")
+            ?.querySelector(".open-positions__dept-title-link")
+            ?.textContent.trim() || "",
+      }));
+    });
 
-      return jobs;
-    };
+    logger.info(`Found ${jobs.length} Dropbox jobs. Scraping details...`);
 
-    const jobs = await extractJobs();
-    logger.info(`Found ${jobs.length} Dropbox jobs`);
-
-    // Extract job descriptions
     for (const job of jobs) {
       try {
         await page.goto(job.url, { waitUntil: "networkidle0" });
-        job.description = await page.evaluate((selector) => {
-          const descElement = document.querySelector(selector.jobDescription);
-          return descElement ? descElement.innerText.trim() : "";
-        }, selector);
-        logger.info(`Extracted description for job: ${job.title}`);
+        const jobDetails = await page.evaluate(() => {
+          const findSectionContent = (headingText) => {
+            const headings = Array.from(document.querySelectorAll("h2"));
+            const targetHeading = headings.find((h) =>
+              h.textContent.toLowerCase().includes(headingText.toLowerCase()),
+            );
+            if (targetHeading) {
+              let content = "";
+              let nextElem = targetHeading.nextElementSibling;
+              while (nextElem && nextElem.tagName !== "H2") {
+                content += nextElem.innerText + "\n";
+                nextElem = nextElem.nextElementSibling;
+              }
+              return content.trim();
+            }
+            return "";
+          };
+
+          const extractSalaryInfo = () => {
+            const salarySection = document.querySelector(
+              "div:has(> div > div[data-uw-rm-sr])",
+            );
+            if (salarySection) {
+              return Array.from(
+                salarySection.querySelectorAll("div[data-uw-rm-sr]"),
+              )
+                .map((el) => el.textContent.trim())
+                .join(" | ");
+            }
+            return "";
+          };
+
+          return {
+            description:
+              document.querySelector(".jc03-content")?.innerText.trim() || "",
+            salary: extractSalaryInfo(),
+            requirements: findSectionContent("Requirements"),
+            responsibilities: findSectionContent("Responsibilities"),
+            benefits: findSectionContent("Benefits"),
+            companyDescription: findSectionContent("Company Description"),
+            teamDescription: findSectionContent("Team Description"),
+            roleDescription: findSectionContent("Role Description"),
+          };
+        });
+
+        // Use the updated parser with custom keyword sets for Dropbox
+        const dropboxKeywordSets = {
+          ...defaultKeywordSets,
+          salary: ["Total Rewards", "salary", "compensation"],
+          remote: createKeywordMatcher([
+            "Virtual First",
+            "remote",
+            "work from home",
+          ]),
+          experience: ["years of experience", "experience"],
+          education: ["Bachelor's degree", "Master's degree", "PhD"],
+        };
+
+        const parsedInfo = parseJobDescription(
+          jobDetails.description,
+          dropboxKeywordSets,
+        );
+
+        // Convert the remote field to a boolean
+        parsedInfo.remote = !!parsedInfo.remote;
+
+        // Merge the scraped details and parsed info with the existing job data
+        Object.assign(job, jobDetails, parsedInfo);
+
+        logger.info(`Scraped details for job: ${job.title}`);
       } catch (error) {
         logger.error(
-          `Error extracting description for job ${job.title}: ${error.message}`
+          `Error scraping details for job ${job.title}: ${error.message}`,
         );
-        job.description = ""; // Set empty description if extraction fails
       }
     }
 
