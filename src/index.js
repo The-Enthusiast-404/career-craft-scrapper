@@ -9,6 +9,7 @@ import { scrapeSpotifyJobs } from "./scrapers/spotify.js";
 import { scrapeDropbox } from "./scrapers/dropbox.js";
 import { scrapeSlackJobs } from "./scrapers/Slack.js";
 import { scrapeAtlassianJobs } from "./scrapers/atlassian.js";
+import { scrapeDuckduckgoJobs } from "./scrapers/duckduckgo.js";
 import logger from "./utils/logger.js";
 import { sendJobsToAPI } from "./utils/sendJobs.js";
 import { validateAndNormalizeJob } from "./utils/jobUtils.js";
@@ -51,6 +52,10 @@ async function main() {
     // const mozillaJobs = await scrapeMozillaJobs(browser);
     // logger.info(`Found ${mozillaJobs.length} Mozilla jobs with descriptions`);
 
+    logger.info("Starting Duckduckgo job scrapping");
+    const duckduckgoJobs = await scrapeDuckduckgoJobs(browser);
+    logger.info(`Found ${duckduckgoJobs.length} Duckduckgo jobs with descriptions`);
+
     logger.info("Starting Spotify job scrapping");
     const spotifyJobs = await scrapeSpotifyJobs(browser);
     logger.info(`Found ${spotifyJobs.length} Spotify jobs with descriptions`);
@@ -81,6 +86,7 @@ async function main() {
 
       // ...atlassianJobs,
       ...shopifyjobs,
+      ...duckduckgoJobs,
 
     ];
 
