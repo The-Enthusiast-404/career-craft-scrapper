@@ -7,10 +7,6 @@ import {
 
 const DUCKDUCKGO_JOBS_URL = "https://duckduckgo.com/hiring";
 
-// Open positions => [class*="careers_openPositions"]
-// Job item => [typeof="JobPosting"]
-// Department => JobItems.previousElementSibling
-
 export async function scrapeDuckduckgoJobs(browser) {
   const page = await browser.newPage();
   
