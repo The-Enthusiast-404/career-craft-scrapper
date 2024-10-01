@@ -49,37 +49,6 @@ export async function scrapeDuckduckgoJobs(browser) {
       try {
         await page.goto(job.url, { waitUntil: "networkidle0" });
         const jobDetails = await page.evaluate(() => {
-          const findSectionContent = (headingText) => {
-            const headings = Array.from(document.querySelectorAll("h2"));
-            const targetHeading = headings.find((h) =>
-              h.textContent.toLowerCase().includes(headingText.toLowerCase()),
-            );
-            if (targetHeading) {
-              let content = "";
-              let nextElem = targetHeading.nextElementSibling;
-              while (nextElem && nextElem.tagName !== "H2") {
-                content += nextElem.innerText + "\n";
-                nextElem = nextElem.nextElementSibling;
-              }
-              return content.trim();
-            }
-            return "";
-          };
-
-          const extractSalaryInfo = () => {
-            const salarySection = document.querySelector(
-              "div:has(> div > div[data-uw-rm-sr])",
-            );
-            if (salarySection) {
-              return Array.from(
-                salarySection.querySelectorAll("div[data-uw-rm-sr]"),
-              )
-                .map((el) => el.textContent.trim())
-                .join(" | ");
-            }
-            return "";
-          };
-
           const jobDescription = document.querySelector("h3").nextElementSibling;
           const salary = jobDescription
             ?.parentElement
