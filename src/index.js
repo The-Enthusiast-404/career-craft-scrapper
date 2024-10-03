@@ -15,6 +15,7 @@ import { sendJobsToAPI } from "./utils/sendJobs.js";
 import { validateAndNormalizeJob } from "./utils/jobUtils.js";
 import { scrapeShopifyJobs } from "./scrapers/shopify.js";
 import { scrapeSentry } from './scrapers/sentry.js'
+import { scrapeSegmentJobs } from "./scrapers/segment.js";
 
 async function main() {
   let browser;
@@ -69,6 +70,9 @@ async function main() {
     const shopifyjobs = await scrapeShopifyJobs(browser);
     logger.info(`Found ${shopifyjobs.length} shopify jobs`);
 
+    const segmentJobs = await scrapeSegmentJobs(browser);
+    logger.info(`Found ${segmentJobs.length} Segment jobs`);
+    
     const sentryJobs = await scrapeSentry(browser);
     logger.info(`Found ${sentryJobs.length} sentry jobs`);
 
@@ -91,9 +95,8 @@ async function main() {
       // ...atlassianJobs,
       ...shopifyjobs,
       ...duckduckgoJobs,
-
+      ...segmentJobs,
       ...sentryJobs,
-
     ];
 
     // Filter and process jobs
