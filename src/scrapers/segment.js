@@ -43,15 +43,12 @@ export async function scrapeSegmentJobs(browser) {
         await page.goto(job.url, { waitUntil: "networkidle0" });
         const jobDetails = await page.evaluate(() => {
           const jobDescription = document.querySelector(".job__description");
+          if (!jobDescription) return {};
 
           const findSectionContent = (sectionName) => {
-            const sectionHeader = Array.from(
-              jobDescription.querySelectorAll("h2"),
-            ).find((element) => element.textContent.includes(sectionName));
-
-            if (!sectionHeader) {
-              return "";
-            }
+            const sectionHeader = Array.from(jobDescription.querySelectorAll("h2"))
+              .find((element) => element.textContent.includes(sectionName));
+            if (!sectionHeader) return "";
 
             let content = "";
             let nextElement = sectionHeader.nextElementSibling;
