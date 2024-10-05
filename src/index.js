@@ -16,6 +16,7 @@ import { validateAndNormalizeJob } from "./utils/jobUtils.js";
 import { scrapeShopifyJobs } from "./scrapers/shopify.js";
 import { scrapeSentry } from './scrapers/sentry.js'
 import { scrapeSegmentJobs } from "./scrapers/segment.js";
+import { scrapeAuth0Jobs } from './scrapers/auth0.js'
 
 async function main() {
   let browser;
@@ -76,6 +77,9 @@ async function main() {
     const sentryJobs = await scrapeSentry(browser);
     logger.info(`Found ${sentryJobs.length} sentry jobs`);
 
+    const auth0Jobs = await scrapeAuth0Jobs(browser);
+    logger.info(`Found ${auth0Jobs.length} Auth0 jobs`);
+
     // Combine all jobs
     let allJobs = [
 
@@ -97,6 +101,7 @@ async function main() {
       ...duckduckgoJobs,
       ...segmentJobs,
       ...sentryJobs,
+      ...auth0Jobs,
     ];
 
     // Filter and process jobs
