@@ -13,6 +13,7 @@ import logger from "./utils/logger.js";
 import { sendJobsToAPI } from "./utils/sendJobs.js";
 import { validateAndNormalizeJob } from "./utils/jobUtils.js";
 import { scrapeShopifyJobs } from "./scrapers/shopify.js";
+import { scrapeCircleCiJobs } from "./scrapers/circleCi.js";
 
 async function main() {
   let browser;
@@ -63,6 +64,11 @@ async function main() {
     const shopifyjobs = await scrapeShopifyJobs(browser);
     logger.info(`Found ${shopifyjobs.length} shopify jobs`);
 
+
+    // scrape Cicle Ci jobs
+    const circleCiJobs = await scrapeCircleCiJobs(browser);
+    logger.info(`Found ${circleCiJobs.length} CircleCI jobs with descriptions`);
+    
     // Combine all jobs
     let allJobs = [
 
@@ -77,6 +83,7 @@ async function main() {
       // ...airbnbJobs,
       // ...mozillaJobs,
       ...spotifyJobs,
+      ...circleCiJobs,
       // Add other job arrays here when uncommented
 
       // ...atlassianJobs,
