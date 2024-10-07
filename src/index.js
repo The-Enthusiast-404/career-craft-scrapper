@@ -9,11 +9,14 @@ import { scrapeSpotifyJobs } from "./scrapers/spotify.js";
 import { scrapeDropbox } from "./scrapers/dropbox.js";
 import { scrapeSlackJobs } from "./scrapers/Slack.js";
 import { scrapeAtlassianJobs } from "./scrapers/atlassian.js";
+import { scrapeDuckduckgoJobs } from "./scrapers/duckduckgo.js";
 import logger from "./utils/logger.js";
 import { sendJobsToAPI } from "./utils/sendJobs.js";
 import { validateAndNormalizeJob } from "./utils/jobUtils.js";
 import { scrapeShopifyJobs } from "./scrapers/shopify.js";
 import { scrapeCircleCiJobs } from "./scrapers/circleCi.js";
+import { scrapeSentry } from './scrapers/sentry.js'
+import { scrapeSegmentJobs } from "./scrapers/segment.js";
 
 async function main() {
   let browser;
@@ -52,6 +55,10 @@ async function main() {
     // const mozillaJobs = await scrapeMozillaJobs(browser);
     // logger.info(`Found ${mozillaJobs.length} Mozilla jobs with descriptions`);
 
+    logger.info("Starting Duckduckgo job scrapping");
+    const duckduckgoJobs = await scrapeDuckduckgoJobs(browser);
+    logger.info(`Found ${duckduckgoJobs.length} Duckduckgo jobs with descriptions`);
+
     logger.info("Starting Spotify job scrapping");
     const spotifyJobs = await scrapeSpotifyJobs(browser);
     logger.info(`Found ${spotifyJobs.length} Spotify jobs with descriptions`);
@@ -64,11 +71,14 @@ async function main() {
     const shopifyjobs = await scrapeShopifyJobs(browser);
     logger.info(`Found ${shopifyjobs.length} shopify jobs`);
 
-
     // scrape Cicle Ci jobs
     const circleCiJobs = await scrapeCircleCiJobs(browser);
     logger.info(`Found ${circleCiJobs.length} CircleCI jobs with descriptions`);
+    const segmentJobs = await scrapeSegmentJobs(browser);
+    logger.info(`Found ${segmentJobs.length} Segment jobs`);
     
+    const sentryJobs = await scrapeSentry(browser);
+    logger.info(`Found ${sentryJobs.length} sentry jobs`);
     // Combine all jobs
     let allJobs = [
 
@@ -88,7 +98,9 @@ async function main() {
 
       // ...atlassianJobs,
       ...shopifyjobs,
-
+      ...duckduckgoJobs,
+      ...segmentJobs,
+      ...sentryJobs,
     ];
 
     // Filter and process jobs
