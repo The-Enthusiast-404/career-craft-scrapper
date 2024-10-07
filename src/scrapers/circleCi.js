@@ -10,7 +10,7 @@ export async function scrapeCircleCijobs(browser){
     try{
       // navigate to CircleCI careers page
       await page.goto("https://circleci.com/careers/jobs/" ,{
-        waitUntill:"networkidle0" ,
+        waitUntil:"networkidle0" , timeout:60000
       });
       // Get the page content
       const content=await page.content();
@@ -32,7 +32,6 @@ export async function scrapeCircleCijobs(browser){
         logger.error(`Selector loading error: ${selectorError.message}`);
         return []; 
           }
-
       $("div#jobs-list div.margin-bottom-medium").each((index, element) => {
       
         const jobTitles = [];
@@ -68,11 +67,10 @@ export async function scrapeCircleCijobs(browser){
       });
       
       logger.info(`Scraped ${jobs.length} Circle Ci jobs. Scraping deatils...`);
-
       // scrape job description
       for(const job of jobs){
         try{
-          if(job.url && jobs.url !="#"){
+          if(job.url && job.url !="#"){
             await page.goto(job.url , {waitUntil:"networkidle2"});
 
             await page.waitForSelector('div.job-detail-col.col-lg-8.col-lg-pull-4');
@@ -95,15 +93,46 @@ export async function scrapeCircleCijobs(browser){
               jobDescription = "Description not found";
           }
             job.description = jobDescription.replace('Overview:', '');
-          }
-        } catch(error){
+
+            // Scrape Job Salary
+            try{
+                const payRangeElement=await page.$('div.pay-range');
+                if(payRangeElement){
+                  const minPay = await page.evaluate(el => el.querySelector("span:first-child").textContent.trim(),payRangeElement);
+                  const maxPay = await page.evaluate(el => el.querySelector("span:last-child").textContent.trim(),payRangeElement);      
+                  const combinedPayRange = `${minPay}-${maxPay}`;
+                  job.salary=(combinedPayRange);
+                } else{
+                  job.salary="Salary not specified";
+                }
+              } catch(error){
+                logger.error(`Error scraping salary for ${job.title}: ${error.message}`);
+                job.salary = "Error retrieving salary";
+              }
+              try{
+                  const skillsUl= await page.$('div.job-detail-col.col-lg-8.col-lg-pull-4 ul:nth-of-type(2)');
+                  let liData='';
+                  if(skillsUl){
+                    liData=await page.evaluate( el =>{
+                    const lis=el.querySelectorAll('li');
+                    return Array.from(lis).map(li => li.innerText.trim()).join('');
+                    },skillsUl);
+                  }
+                  job.skills= liData || "Skills not specified";
+              }
+              catch(error){
+              logger.error(`Error scraping skills for ${job.title}: ${error.message}`);
+              job.skills= `Error retrieving skills`;
+                  }
+               }
+          } catch(error){
           logger.error(
             `Error scraping job description for ${job.title}:${error.message}`
           );
           job.description = "Error retrieving description";
         }
       }
-      logger.info('Scraped jobs:', jobs);
+      console.log(jobs);
       return jobs;
     } catch(error){
       logger.error(`Error while scraping Circle Ci jobs: ${error.message}`);
