@@ -14,6 +14,7 @@ import logger from "./utils/logger.js";
 import { sendJobsToAPI } from "./utils/sendJobs.js";
 import { validateAndNormalizeJob } from "./utils/jobUtils.js";
 import { scrapeShopifyJobs } from "./scrapers/shopify.js";
+import { scrapeCircleCiJobs } from "./scrapers/circleCi.js";
 import { scrapeSentry } from './scrapers/sentry.js'
 import { scrapeSegmentJobs } from "./scrapers/segment.js";
 import { scrapeAuth0Jobs } from './scrapers/auth0.js'
@@ -71,15 +72,16 @@ async function main() {
     const shopifyjobs = await scrapeShopifyJobs(browser);
     logger.info(`Found ${shopifyjobs.length} shopify jobs`);
 
+    // scrape Cicle Ci jobs
+    const circleCiJobs = await scrapeCircleCiJobs(browser);
+    logger.info(`Found ${circleCiJobs.length} CircleCI jobs with descriptions`);
     const segmentJobs = await scrapeSegmentJobs(browser);
     logger.info(`Found ${segmentJobs.length} Segment jobs`);
     
     const sentryJobs = await scrapeSentry(browser);
     logger.info(`Found ${sentryJobs.length} sentry jobs`);
-
     const auth0Jobs = await scrapeAuth0Jobs(browser);
     logger.info(`Found ${auth0Jobs.length} Auth0 jobs`);
-
     // Combine all jobs
     let allJobs = [
 
@@ -94,6 +96,7 @@ async function main() {
       // ...airbnbJobs,
       // ...mozillaJobs,
       ...spotifyJobs,
+      ...circleCiJobs,
       // Add other job arrays here when uncommented
 
       // ...atlassianJobs,
