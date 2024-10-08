@@ -4,7 +4,15 @@ import logger from "../utils/logger.js";
 export const GITHUB_JOBS_URL = "https://www.github.careers/careers-home/jobs";
 
 export async function jobListingEvaluation() {
-  return [];
+  const jobCards = document.querySelectorAll('mat-expansion-panel');
+
+  return Array.from(jobCards).map(job => ({ 
+    title: job.querySelector('.job-title').textContent.trim() || "" , 
+    url: job.querySelector('a').href,
+    company: "GitHub", 
+    location: job.querySelector('.label-value.location').textContent.trim() || "",
+    department: job.querySelector('.label-value.categories').textContent.trim() || "",
+  }));
 }
 
 export async function scrapeGithub(browser) {
