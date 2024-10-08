@@ -30,6 +30,7 @@ export async function scrape(browser, url, scrapper) {
 
     return jobs;
   } catch (error) {
+    logger.error(`Error scraping jobs from ${url}: ${error.message}`);
     throw error;
   } finally {
     await page.close();
