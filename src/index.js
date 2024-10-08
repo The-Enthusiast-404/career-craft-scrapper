@@ -14,10 +14,11 @@ import logger from "./utils/logger.js";
 import { sendJobsToAPI } from "./utils/sendJobs.js";
 import { validateAndNormalizeJob } from "./utils/jobUtils.js";
 import { scrapeShopifyJobs } from "./scrapers/shopify.js";
-import { scrapeCircleCiJobs } from "./scrapers/circleCi.js";
+// import { scrapeCircleCiJobs } from "./scrapers/circleCi.js";
 import { scrapeSentry } from './scrapers/sentry.js'
 import { scrapeSegmentJobs } from "./scrapers/segment.js";
 import { scrapeAuth0Jobs } from './scrapers/auth0.js'
+import { scrapeZappierJobs } from "./scrapers/Zappier.js";
 
 async function main() {
   let browser;
@@ -56,32 +57,37 @@ async function main() {
     // const mozillaJobs = await scrapeMozillaJobs(browser);
     // logger.info(`Found ${mozillaJobs.length} Mozilla jobs with descriptions`);
 
-    logger.info("Starting Duckduckgo job scrapping");
-    const duckduckgoJobs = await scrapeDuckduckgoJobs(browser);
-    logger.info(`Found ${duckduckgoJobs.length} Duckduckgo jobs with descriptions`);
+    // logger.info("Starting Duckduckgo job scrapping");
+    // const duckduckgoJobs = await scrapeDuckduckgoJobs(browser);
+    // logger.info(`Found ${duckduckgoJobs.length} Duckduckgo jobs with descriptions`);
 
-    logger.info("Starting Spotify job scrapping");
-    const spotifyJobs = await scrapeSpotifyJobs(browser);
-    logger.info(`Found ${spotifyJobs.length} Spotify jobs with descriptions`);
+    // logger.info("Starting Spotify job scrapping");
+    // const spotifyJobs = await scrapeSpotifyJobs(browser);
+    // logger.info(`Found ${spotifyJobs.length} Spotify jobs with descriptions`);
 
     // logger.info("Starting Paytm job scraping");
     // const paytmJobs = await scrapePaytmJobs(browser);
     // logger.info(`Found ${paytmJobs.length} Paytm jobs with descriptions`);
 
     //scrape shopify jobs
-    const shopifyjobs = await scrapeShopifyJobs(browser);
-    logger.info(`Found ${shopifyjobs.length} shopify jobs`);
+    // const shopifyjobs = await scrapeShopifyJobs(browser);
+    // logger.info(`Found ${shopifyjobs.length} shopify jobs`);
 
-    // scrape Cicle Ci jobs
-    const circleCiJobs = await scrapeCircleCiJobs(browser);
-    logger.info(`Found ${circleCiJobs.length} CircleCI jobs with descriptions`);
-    const segmentJobs = await scrapeSegmentJobs(browser);
-    logger.info(`Found ${segmentJobs.length} Segment jobs`);
+    // // scrape Cicle Ci jobs
+    // const circleCiJobs = await scrapeCircleCiJobs(browser);
+    // logger.info(`Found ${circleCiJobs.length} CircleCI jobs with descriptions`);
+    // const segmentJobs = await scrapeSegmentJobs(browser);
+    // logger.info(`Found ${segmentJobs.length} Segment jobs`);
     
-    const sentryJobs = await scrapeSentry(browser);
-    logger.info(`Found ${sentryJobs.length} sentry jobs`);
-    const auth0Jobs = await scrapeAuth0Jobs(browser);
-    logger.info(`Found ${auth0Jobs.length} Auth0 jobs`);
+    // const sentryJobs = await scrapeSentry(browser);
+    // logger.info(`Found ${sentryJobs.length} sentry jobs`);
+    // const auth0Jobs = await scrapeAuth0Jobs(browser);
+    // logger.info(`Found ${auth0Jobs.length} Auth0 jobs`);
+
+    // Scrape Zappier jobs
+const zappierJobs = await scrapeZappierJobs(browser);
+logger.info(`Found ${zappierJobs.length} Zappier jobs with descriptions`);
+
     // Combine all jobs
     let allJobs = [
 
@@ -95,16 +101,17 @@ async function main() {
 
       // ...airbnbJobs,
       // ...mozillaJobs,
-      ...spotifyJobs,
-      ...circleCiJobs,
+      // ...spotifyJobs,
+      // ...circleCiJobs,
       // Add other job arrays here when uncommented
 
       // ...atlassianJobs,
-      ...shopifyjobs,
-      ...duckduckgoJobs,
-      ...segmentJobs,
-      ...sentryJobs,
-      ...auth0Jobs,
+      // ...shopifyjobs,
+      // ...duckduckgoJobs,
+      // ...segmentJobs,
+      // ...sentryJobs,
+      // ...auth0Jobs,
+      ...zappierJobs,
     ];
 
     // Filter and process jobs
