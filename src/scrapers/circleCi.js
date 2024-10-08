@@ -109,6 +109,7 @@ export async function scrapeCircleCijobs(browser){
                 logger.error(`Error scraping salary for ${job.title}: ${error.message}`);
                 job.salary = "Error retrieving salary";
               }
+              // Scrape Job Skills
               try{
                   const skillsUl= await page.$('div.job-detail-col.col-lg-8.col-lg-pull-4 ul:nth-of-type(2)');
                   let liData='';
@@ -124,6 +125,36 @@ export async function scrapeCircleCijobs(browser){
               logger.error(`Error scraping skills for ${job.title}: ${error.message}`);
               job.skills= `Error retrieving skills`;
                   }
+
+                  // Scrape Job Experience
+                try{
+                  const experienceElement= await page.$('div.job-detail-col.col-lg-8.col-lg-pull-4 ul:nth-of-type(2) li:first-child');
+                  let liData='';
+                  if (job.title =='Technical Writer') {
+                   const specialExperienceElement= await page.$('div.job-detail-col.col-lg-8.col-lg-pull-4 ul:nth-of-type(7) li:nth-child(2)');
+                   liData=await page.evaluate( el => el.innerText.replace(/\n/g, ' ').trim(), specialExperienceElement);
+                  }
+                 else if(experienceElement){
+                  liData= await page.evaluate( el => el.innerText.trim(), experienceElement);
+                  }
+                  job.experience=liData || "Experience not specified";
+                } catch(error){
+                  logger.error(`Error scraping experience for ${job.title}: ${error.message}`);
+                  job.experience=`Error retrieving experience`;
+                }
+
+                // Scrape Job is remote availability
+                try{
+                  if(job.title=='Senior Software Engineer - Experiences'  || job.title=='Software Engineer - Sources of Change' || job.title=='Support Engineer') {
+                    job.remote='yes'
+                  } else{
+                    job.remote='Not specified'
+                  }
+                }catch(error){
+                  logger.error(`Error scraping remote availability for ${job.title}: ${error.message}`);
+                  job.remote=`Error retrieving experience`;
+                }
+
                }
           } catch(error){
           logger.error(
