@@ -96,24 +96,35 @@ export class Scrapper {
       ? await this.config.jobListingScrapper(page, this.config.jobListingEvaluation)
       : await page.evaluate(this.config.jobListingEvaluation);
 
+    logger.info(`Found ${jobs.length} jobs.`);
+
     if (!this.config.jobDetailEvaluation) {
       await page.close();
       return jobs;
     }
 
+    logger.info(`Scraping details for ${jobs.length} jobs.`);
+
     for (let job of jobs) {
-      await page.goto(job.url, { waitUntil: "networkidle0" });
-      if (this.config.jobDetailSelector) {
-        await page.waitForSelector(this.config.jobDetailSelector);
+      try {
+        await page.goto(job.url, { waitUntil: "networkidle0" });
+
+        if (this.config.jobDetailSelector) {
+          await page.waitForSelector(this.config.jobDetailSelector);
+        }
+
+        // If jobDetailScrapper is set, use it to scrape the job details
+        // Otherwise, use the jobDetailEvaluation function to scrape the job details
+        const details = this.config.jobDetailScrapper
+          ? await this.config.jobDetailScrapper(page, this.config.jobDetailEvaluation)
+          : await page.evaluate(this.config.jobDetailEvaluation);
+
+        Object.assign(job, details);
+
+        logger.info(`Scraped details for job: ${job.title}`);
+      } catch (error) {
+        logger.error(`Error scraping details for job ${job.title}: ${error.message}`);
       }
-
-      // If jobDetailScrapper is set, use it to scrape the job details
-      // Otherwise, use the jobDetailEvaluation function to scrape the job details
-      const details = this.config.jobDetailScrapper
-        ? await this.config.jobDetailScrapper(page, this.config.jobDetailEvaluation)
-        : await page.evaluate(this.config.jobDetailEvaluation);
-
-      Object.assign(job, details);
     }
 
     await page.close();
@@ -121,6 +132,9 @@ export class Scrapper {
   }
 }
 
+/**
+ * @deprecated
+ */
 export async function scrape(browser, url, scrapper) {
   const {jobListing, jobDetail} = scrapper;
   const page = await browser.newPage();

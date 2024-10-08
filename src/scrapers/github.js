@@ -8,11 +8,32 @@ export async function jobListingEvaluation() {
 
   return Array.from(jobCards).map(job => ({ 
     title: job.querySelector('.job-title').textContent.trim() || "" , 
-    url: job.querySelector('a').href,
+    url: job.querySelector('a.read-more-button').href,
     company: "GitHub", 
     location: job.querySelector('.label-value.location').textContent.trim() || "",
     department: job.querySelector('.label-value.categories').textContent.trim() || "",
   }));
+}
+
+export async function jobDetailEvaluation() {
+  const metadata = document.querySelector('.meta-data-options');
+  const description = document.querySelector('article');
+
+  return {
+      description: description.innerText.trim() || "",
+      // category: "",
+      // jobType: "",
+      // responsibilities: "",
+      // qualifications: "",
+      // benefits: "",
+      // remoteType: "",
+      // experience: "",
+      // education: "",
+      // salary: "",
+      // applicationDeadline: "",
+      // postedDate: "",
+      // companyDescription: "",
+  };
 }
 
 export async function scrapeGithub(browser) {
@@ -49,6 +70,8 @@ export async function scrapeGithub(browser) {
 
         return jobs;
       })
+      .setJobDetailEvaluation(jobDetailEvaluation)
+      .setJobDetailSelector(".job-description-container")
       .setBrowser(browser)
       .build();
 
