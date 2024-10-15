@@ -19,6 +19,7 @@ import { scrapeSentry } from './scrapers/sentry.js'
 import { scrapeSegmentJobs } from "./scrapers/segment.js";
 import { scrapeAuth0Jobs } from './scrapers/auth0.js'
 import { scrapeZappierJobs } from "./scrapers/Zappier.js";
+import { NetflixJobScrapper } from "./scrapers/Netflix.js";
 
 async function main() {
   let browser;
@@ -85,8 +86,13 @@ async function main() {
     // logger.info(`Found ${auth0Jobs.length} Auth0 jobs`);
 
     // Scrape Zappier jobs
-const zappierJobs = await scrapeZappierJobs(browser);
-logger.info(`Found ${zappierJobs.length} Zappier jobs with descriptions`);
+    // const zappierJobs = await scrapeZappierJobs(browser);
+    // logger.info(`Found ${zappierJobs.length} Zappier jobs with descriptions`);
+
+    // scrape Netflix Jobs
+    const NetflixJobs = await NetflixJobScrapper(browser);
+    logger.info(`Found ${NetflixJobs.length} Netflix jobs with valid description`);
+
 
     // Combine all jobs
     let allJobs = [
@@ -111,7 +117,9 @@ logger.info(`Found ${zappierJobs.length} Zappier jobs with descriptions`);
       // ...segmentJobs,
       // ...sentryJobs,
       // ...auth0Jobs,
-      ...zappierJobs,
+      // ...zappierJobs,
+        //  ...ToptalJobs,
+        ...NetflixJobs
     ];
 
     // Filter and process jobs
@@ -122,6 +130,7 @@ logger.info(`Found ${zappierJobs.length} Zappier jobs with descriptions`);
     const tableData = allJobs.map((job) => ({
       title: job.title,
       company: job.company,
+      JobId: job.JobId.toString(),
       location: job.location,
       salary: job.salary,
       role: job.role,

@@ -10,6 +10,7 @@ export function validateAndNormalizeJob(job) {
   const normalizedJob = {
     title: job.title.trim(),
     company: job.company.trim(),
+    JobId: job.JobId || "check in the link",
     location: job.location ? job.location.trim() : "Not specified",
     salary: job.salary ? job.salary.trim() : "Not specified",
     role: job.role ? job.role.trim() : "Not specified",
@@ -20,7 +21,7 @@ export function validateAndNormalizeJob(job) {
     department: job.department ? job.department.trim() : "Not specified",
     jobType: job.jobType ? job.jobType.trim() : "Not specified",
     url: job.url ? job.url.trim() : "",
-    description: job.description ? job.description.trim() : "",
+    description: job.description ? job.description.trim() : "Not specified",
   };
 
   return normalizedJob;
