@@ -20,11 +20,17 @@ import { scrapeSegmentJobs } from "./scrapers/segment.js";
 import { scrapeAuth0Jobs } from './scrapers/auth0.js'
 import { scrapeZappierJobs } from "./scrapers/Zappier.js";
 import { NetflixJobScrapper } from "./scrapers/Netflix.js";
+import { lyftJobScrapper } from "./scrapers/lyft.js";
+import { scrapeAtlassianLoomJobs } from "./scrapers/atlassianLoom.js";
 
 async function main() {
   let browser;
   try {
     browser = await launchBrowser();
+
+    // scrape the atalssian jobs
+    // const atlassianJobs = await scrapeAtlassianJobs (browser);
+    // logger.info(`Found ${atlassianJobs.length} atlassian jobs`);
 
 
     // logger.info("Starting Dropbox job scrapping");
@@ -90,8 +96,16 @@ async function main() {
     // logger.info(`Found ${zappierJobs.length} Zappier jobs with descriptions`);
 
     // scrape Netflix Jobs
-    const NetflixJobs = await NetflixJobScrapper(browser);
-    logger.info(`Found ${NetflixJobs.length} Netflix jobs with valid description`);
+    // const NetflixJobs = await NetflixJobScrapper(browser);
+    // logger.info(`Found ${NetflixJobs.length} Netflix jobs with valid description`);
+
+    // Scrape the Toptal jobs
+    // const lyftJob = await lyftJobScrapper(browser);
+    // logger.info(`Found ${lyftJob.length} lyftJob jobs with valid description`);
+
+    // scrape the atlassianLoom Jobs
+    const atlassianLoom = await scrapeAtlassianLoomJobs(browser);
+    logger.info(`Found ${atlassianLoom.length} AtlassianLoom jobs with valid description`);
 
 
     // Combine all jobs
@@ -118,8 +132,9 @@ async function main() {
       // ...sentryJobs,
       // ...auth0Jobs,
       // ...zappierJobs,
-        //  ...ToptalJobs,
-        ...NetflixJobs
+      // ...NetflixJobs
+      // ...lyftJob
+      ...atlassianLoom
     ];
 
     // Filter and process jobs
