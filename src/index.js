@@ -20,8 +20,8 @@ import { scrapeSegmentJobs } from "./scrapers/segment.js";
 import { scrapeAuth0Jobs } from './scrapers/auth0.js'
 import { scrapeZappierJobs } from "./scrapers/Zappier.js";
 import { NetflixJobScrapper } from "./scrapers/Netflix.js";
-import { lyftJobScrapper } from "./scrapers/lyft.js";
 import { scrapeAtlassianLoomJobs } from "./scrapers/atlassianLoom.js";
+import { scrapeStripeJobs } from "./scrapers/stripe.js";
 
 async function main() {
   let browser;
@@ -46,11 +46,10 @@ async function main() {
     // const flipkartJobs = await scrapeFlipkartJobs(browser);
     // logger.info(`Found ${flipkartJobs.length} Flipkart jobs`);
 
-    // // Scrape Airbnb jobs
+    // Scrape Airbnb jobs
     //logger.info("Starting Airbnb job scraping");
     //const airbnbJobs = await scrapeAirbnbJobs(browser);
     //logger.info(`Found ${airbnbJobs.length} Airbnb jobs with details`);
-
 
     // logger.info("Starting Slack job scraping");
     // const slackJobs = await scrapeSlackJobs(browser);
@@ -99,13 +98,13 @@ async function main() {
     // const NetflixJobs = await NetflixJobScrapper(browser);
     // logger.info(`Found ${NetflixJobs.length} Netflix jobs with valid description`);
 
-    // Scrape the Toptal jobs
-    // const lyftJob = await lyftJobScrapper(browser);
-    // logger.info(`Found ${lyftJob.length} lyftJob jobs with valid description`);
-
     // scrape the atlassianLoom Jobs
-    const atlassianLoom = await scrapeAtlassianLoomJobs(browser);
-    logger.info(`Found ${atlassianLoom.length} AtlassianLoom jobs with valid description`);
+    // const atlassianLoom = await scrapeAtlassianLoomJobs(browser);
+    // logger.info(`Found ${atlassianLoom.length} AtlassianLoom jobs with valid description`);
+
+    //scrape the Gitlab Jobs
+    const stripe = await scrapeStripeJobs(browser);
+    logger.info(`Found ${stripe.length} stripe jobs with valid description`);
 
 
     // Combine all jobs
@@ -133,8 +132,8 @@ async function main() {
       // ...auth0Jobs,
       // ...zappierJobs,
       // ...NetflixJobs
-      // ...lyftJob
-      ...atlassianLoom
+      // ...atlassianLoom
+         ...stripe,
     ];
 
     // Filter and process jobs
