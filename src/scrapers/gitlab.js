@@ -1,16 +1,16 @@
 const axios = require('axios');
 
 const baseUrl = 'https://gitlab.com/api/v4/';
-const accessToken = 'glpat-XTM5QsLJA88sG_LrDdHD';
 
 async function getProjectId(projectName) {
-    const url = `${baseUrl}/projects?search=${projectName}`;
-    const config = {
-        headers: {
-            Authorization: `Bearer ${accessToken}`
-        }
-    };
+  const gitlabToken = process.env.GITLAB_TOKEN; // Access the environment variable
 
+  const url = `<span class="math-inline">\{baseUrl\}/projects?search\=</span>{projectName}`;
+  const config = {
+    headers: {
+      Authorization: `Bearer ${gitlabToken}`
+    }
+  };
     try {
         const response = await axios.get(url, config);
         const projects = response.data;
