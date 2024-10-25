@@ -23,6 +23,9 @@ import { NetflixJobScrapper } from "./scrapers/Netflix.js";
 import { lyftJobScrapper } from "./scrapers/lyft.js";
 import { scrapeAtlassianLoomJobs } from "./scrapers/atlassianLoom.js";
 
+const gitlabScraper = require('./scrapers/gitlab.js');
+
+
 async function main() {
   let browser;
   try {
@@ -103,9 +106,16 @@ async function main() {
     // const lyftJob = await lyftJobScrapper(browser);
     // logger.info(`Found ${lyftJob.length} lyftJob jobs with valid description`);
 
+
+// Scrape GitLab jobs
+ const gitlabJobs = await gitlabScraper.getJobs();
+logger.info(`Found ${gitlabJobs.length} GitLab jobs`);
+
     // scrape the atlassianLoom Jobs
     const atlassianLoom = await scrapeAtlassianLoomJobs(browser);
     logger.info(`Found ${atlassianLoom.length} AtlassianLoom jobs with valid description`);
+
+ 
 
 
     // Combine all jobs
@@ -132,11 +142,14 @@ async function main() {
       // ...sentryJobs,
       // ...auth0Jobs,
       // ...zappierJobs,
-      // ...NetflixJobs
-      // ...lyftJob
+      // ...NetflixJobs,
+      // ...lyftJob,
+      // ...gitlabJobs
+      
       ...atlassianLoom
     ];
 
+    
     // Filter and process jobs
     allJobs = allJobs.map(validateAndNormalizeJob).filter(Boolean);
     logger.info(`Total valid jobs after normalization: ${allJobs.length}`);
