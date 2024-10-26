@@ -18,6 +18,7 @@ import { scrapeCircleCiJobs } from "./scrapers/circleCi.js";
 import { scrapeSentry } from './scrapers/sentry.js'
 import { scrapeSegmentJobs } from "./scrapers/segment.js";
 import { scrapeAuth0Jobs } from './scrapers/auth0.js'
+import { scrapetoptaljobs } from "./scrapers/topTal.js";
 
 async function main() {
   let browser;
@@ -82,6 +83,10 @@ async function main() {
     logger.info(`Found ${sentryJobs.length} sentry jobs`);
     const auth0Jobs = await scrapeAuth0Jobs(browser);
     logger.info(`Found ${auth0Jobs.length} Auth0 jobs`);
+
+    // scrape Toptal jobs
+    const toptalJobs= await scrapetoptaljobs(browser);
+    logger.info(`Found ${toptalJobs.length} Toptal jobs`)
     // Combine all jobs
     let allJobs = [
 
@@ -105,6 +110,7 @@ async function main() {
       ...segmentJobs,
       ...sentryJobs,
       ...auth0Jobs,
+      ...toptalJobs,
     ];
 
     // Filter and process jobs
