@@ -18,6 +18,7 @@ import { scrapeShopifyJobs } from "./scrapers/shopify.js";
 import { scrapeSentry } from './scrapers/sentry.js'
 import { scrapeSegmentJobs } from "./scrapers/segment.js";
 import { scrapeAuth0Jobs } from './scrapers/auth0.js'
+import { scrapetoptaljobs } from "./scrapers/topTal.js";
 import { scrapeZappierJobs } from "./scrapers/Zappier.js";
 import { NetflixJobScrapper } from "./scrapers/Netflix.js";
 import { scrapeAtlassianLoomJobs } from "./scrapers/atlassianLoom.js";
@@ -85,6 +86,14 @@ async function main() {
     // const segmentJobs = await scrapeSegmentJobs(browser);
     // logger.info(`Found ${segmentJobs.length} Segment jobs`);
     
+    const sentryJobs = await scrapeSentry(browser);
+    logger.info(`Found ${sentryJobs.length} sentry jobs`);
+    const auth0Jobs = await scrapeAuth0Jobs(browser);
+    logger.info(`Found ${auth0Jobs.length} Auth0 jobs`);
+
+    // scrape Toptal jobs
+    const toptalJobs= await scrapetoptaljobs(browser);
+    logger.info(`Found ${toptalJobs.length} Toptal jobs`)
     // const sentryJobs = await scrapeSentry(browser);
     // logger.info(`Found ${sentryJobs.length} sentry jobs`);
     // const auth0Jobs = await scrapeAuth0Jobs(browser);
@@ -125,6 +134,12 @@ async function main() {
       // Add other job arrays here when uncommented
 
       // ...atlassianJobs,
+      ...shopifyjobs,
+      ...duckduckgoJobs,
+      ...segmentJobs,
+      ...sentryJobs,
+      ...auth0Jobs,
+      ...toptalJobs,
       // ...shopifyjobs,
       // ...duckduckgoJobs,
       // ...segmentJobs,
