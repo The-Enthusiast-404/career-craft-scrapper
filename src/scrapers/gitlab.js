@@ -28,13 +28,3 @@ async function getProjectId(projectName) {
         return null;
     }
 }
-
-// Example usage:
-getProjectId('my-project-name')
-    .then(projectId => {
-        if (projectId) {
-            console.log('Project ID:', projectId);
-            // Use the projectId to fetch jobs
-            getJobs(projectId);
-        }
-    });
