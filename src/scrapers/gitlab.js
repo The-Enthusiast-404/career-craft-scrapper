@@ -1,30 +1,27 @@
-const axios = require('axios');
+import puppeteer from 'puppeteer';
 
-const baseUrl = 'https://gitlab.com/api/v4/';
+async function scrapeGitLabJobs() {
+  const browser = await puppeteer.launch();
+  const page = await browser.newPage();
+  await page.goto('https://about.gitlab.com/jobs/all-jobs/');
 
-async function getProjectId(projectName) {
-  const gitlabToken = process.env.GITLAB_TOKEN; // Access the environment variable
+  // Wait for the page to fully load, including dynamic content
+  await page.waitForSelector('.job-listing');
 
-  const url = `<span class="math-inline">\{baseUrl\}/projects?search\=</span>{projectName}`;
-  const config = {
-    headers: {
-      Authorization: `Bearer ${gitlabToken}`
-    }
-  };
-    try {
-        const response = await axios.get(url, config);
-        const projects = response.data;
+  const jobListings = await page.$$('.job-listing');
 
-        // Find the project ID based on the project name
-        const project = projects.find(project => project.name === projectName);
-        if (project) {
-            return project.id;
-        } else {
-            console.log(`Project "${projectName}" not found.`);
-            return null;
-        }
-    } catch (error) {
-        console.error('Error fetching project ID:', error);
-        return null;
-    }
+  const jobs = [];
+  for (const jobListing of jobListings) {
+    const title = await jobListing.$eval('.job-title', el => el.textContent.trim());
+    const link = await jobListing.$eval('.job__link', el => el.href);
+    const location = await jobListing.$eval('.job-location', el => el.textContent.trim());
+
+    jobs.push({ title, link, location });
+  }
+
+  await browser.close();
+
+  console.log(jobs);
 }
+
+scrapeGitLabJobs();
