@@ -7,22 +7,26 @@ async function scrapeGitLabJobs() {
   try {
     await page.goto('https://about.gitlab.com/jobs/all-jobs/');
 
-    // Wait for the first job listing to appear with a reasonable timeout
-    await page.waitForSelector('.jobs-content', { timeout: 30000 });
+    
+    await page.waitForSelector('.department-accordion', { timeout: 30000 });
 
-    const jobListings = await page.$$('.jobs-content');
+    const jobListings = await page.$$('.department-accordion'); 
 
     const jobs = [];
     for (const jobListing of jobListings) {
-      const titleElement = await jobListing.$('.nav-hoc .navigation-dropdown__popover a');
-      const locationElement = await jobListing.$('.slp-mb-8');
-      const linkElement = await jobListing.$('.job__link');
+      const titleElement = await jobListing.$('.job__link'); 
+      const locationElement = await jobListing.$('p'); 
+      const linkElement = await jobListing.$('.job__link'); 
+
       if (titleElement && locationElement) {
         const title = await titleElement.evaluate(el => el.textContent.trim());
-        const link = await titleElement.getProperty('href').then(property => property.jsonValue());
+        const link = await linkElement.getProperty('href').then(property => property.jsonValue());
         const location = await locationElement.evaluate(el => el.textContent.trim());
 
-        jobs.push({ title, link, location });
+      
+        const locationParts = location.split(','); 
+
+        jobs.push({ title, link, location: locationParts[0].trim() }); 
       } else {
         console.warn('Could not find title or location for a job listing.');
       }
