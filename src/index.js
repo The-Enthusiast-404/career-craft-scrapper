@@ -22,7 +22,7 @@ import { scrapetoptaljobs } from "./scrapers/topTal.js";
 import { scrapeZappierJobs } from "./scrapers/Zappier.js";
 import { NetflixJobScrapper } from "./scrapers/Netflix.js";
 import { scrapeAtlassianLoomJobs } from "./scrapers/atlassianLoom.js";
-import { scrapeStripeJobs } from "./scrapers/stripe.js";
+import { scrapegitlabjobs} from "./scrapers/gitlab.js";
 
 async function main() {
   let browser;
@@ -107,13 +107,24 @@ async function main() {
     // const NetflixJobs = await NetflixJobScrapper(browser);
     // logger.info(`Found ${NetflixJobs.length} Netflix jobs with valid description`);
 
+    // Scrape the Toptal jobs
+    // const lyftJob = await lyftJobScrapper(browser);
+    // logger.info(`Found ${lyftJob.length} lyftJob jobs with valid description`);
+
     // scrape the atlassianLoom Jobs
     // const atlassianLoom = await scrapeAtlassianLoomJobs(browser);
     // logger.info(`Found ${atlassianLoom.length} AtlassianLoom jobs with valid description`);
 
     //scrape the Gitlab Jobs
+    //const gitlabJobs = await scrapeGitlabjobs (browser);
+    //loggger.info(`found ${gitlabJobs.length} gitlab jobs`);
+
+
+    //scrape the Stripe Jobs
     const stripe = await scrapeStripeJobs(browser);
     logger.info(`Found ${stripe.length} stripe jobs with valid description`);
+
+ 
 
 
     // Combine all jobs
@@ -147,10 +158,11 @@ async function main() {
       // ...auth0Jobs,
       // ...zappierJobs,
       // ...NetflixJobs
-      // ...atlassianLoom
-         ...stripe,
+      // ...lyftJob
+      ...atlassianLoom
     ];
 
+    
     // Filter and process jobs
     allJobs = allJobs.map(validateAndNormalizeJob).filter(Boolean);
     logger.info(`Total valid jobs after normalization: ${allJobs.length}`);
