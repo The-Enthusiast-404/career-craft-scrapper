@@ -1,43 +1,26 @@
 import puppeteer from 'puppeteer';
 
-async function scrapeAutomatticJobs() {
+(async () => {
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
 
-  try {
-    await page.goto('https://automattic.com/work-with-us/');
+  
+  await page.goto('https://automattic.com/work-with-us/');
 
-    
-    await page.waitForSelector('.job-listing', { timeout: 60000 });
-
-    const jobListings = await page.$$('.job-listing'); 
-
+  const jobDetails = await page.evaluate(() => {
     const jobs = [];
-    for (const jobListing of jobListings) {
-        const titleElement = await jobListing.$('.job-card-header a');
-        const locationElement = await jobListing.$('.job-location');
-        const linkElement = await jobListing.$('.job-card-link');
+    document.querySelectorAll('.job-card').forEach(job => {
+      const title = job.querySelector('.job-card-header h3')?.innerText;
+      const link = job.href;
+      const category = job.querySelector('.job-card-category')?.innerText;
 
-      if (titleElement && locationElement) {
-        const title = await titleElement.evaluate(el => el.textContent.trim());
-        const link = await linkElement.getProperty('href').then(property => property.jsonValue());
-        const location = await locationElement.evaluate(el => el.textContent.trim());
+      jobs.push({ title, link, category });
+    });
+    return jobs;
+  });
 
-      
-        const locationParts = location.split(','); 
+  console.log(`Found ${jobDetails.length} jobs in Automattic jobs page.`);
+  console.log(jobDetails);
 
-        jobs.push({ title, link, location: locationParts[0].trim() }); 
-      } else {
-        console.warn('Could not find title or location for a job listing.');
-      }
-    }
-
-    console.log(jobs);
-  } catch (error) {
-    console.error('Error scraping Automattic jobs:', error);
-  } finally {
-    await browser.close();
-  }
-}
-
-scrapeAutomatticJobs();
+  await browser.close();
+})();
