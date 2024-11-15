@@ -16,11 +16,28 @@ import puppeteer from 'puppeteer';
       }
 
       jobCards.forEach(job => {
-        const title = job.querySelector('.job-card-header h3')?.innerText;
-        const link = job.href;
+        const companyName = document.querySelector('#wrapper > header > h1')?.innerText; 
+        const jobTitle = job.querySelector('.job-card-header h3')?.innerText;
+        const link = job.href; 
         const category = job.querySelector('.job-card-category')?.innerText;
+        const teamProduct = job.querySelector('.job-card-team')?.innerText;
+        const cardType = job.querySelector('.job-card-type')?.innerText; 
 
-        jobs.push({ title, link, category });
+     
+
+              // Get requirements
+      //const requirements = Array.from(document.querySelectorAll('#content > ul > li')).map(li => li.innerText)
+
+        jobs.push({
+          jobTitle,
+          link,
+          category,
+          teamProduct,
+          cardType,
+          companyName
+          //requirements,
+        
+        });
       });
 
       return jobs;
