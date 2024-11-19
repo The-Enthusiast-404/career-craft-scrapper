@@ -120,6 +120,11 @@ async function main() {
     //loggger.info(`found ${gitlabJobs.length} gitlab jobs`);
 
 
+    //scrape the Automattic Jobs
+    const Automatticjobs = await scrapeAutomatticJobs (browser);
+    logger.info(`found ${Automatticjobs.length} Automattic jobs`);
+
+
     //scrape the Stripe Jobs
     const stripe = await scrapeStripeJobs(browser);
     logger.info(`Found ${stripe.length} stripe jobs with valid description`);
@@ -160,6 +165,7 @@ async function main() {
       // ...NetflixJobs
       // ...lyftJob
       ...atlassianLoom
+      //...automatticjobs
     ];
 
     
